@@ -19,7 +19,6 @@ class Game
 		bool initSDL();
 		void close();
 
-		SDL_Event evt;
 		SDL_Window *window;
 		SDL_Renderer *renderer;
 		int SCREEN_WIDTH;

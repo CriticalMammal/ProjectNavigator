@@ -23,26 +23,29 @@ EventHandler::~EventHandler()
 }
 
 
-void EventHandler::handleEvent(SDL_Event eventIn)
+void EventHandler::handleEvents()
 {
-	switch(eventIn.type)
+	while (SDL_PollEvent(&evt) != 0)
 	{
-		case SDL_QUIT:
-			gameRef->setQuit(true);
-			break;
-		case SDL_KEYDOWN:
-			switch(eventIn.key.keysym.sym)
-			{
-				case SDLK_ESCAPE:
-					gameRef->setQuit(true);
-					break;
-			}
-			break;
-		case SDL_KEYUP:
-			switch(eventIn.key.keysym.sym)
-			{
-				// whatever keys are released
-			}
-			break;
+		switch(evt.type)
+		{
+			case SDL_QUIT:
+				gameRef->setQuit(true);
+				break;
+			case SDL_KEYDOWN:
+				switch(evt.key.keysym.sym)
+				{
+					case SDLK_ESCAPE:
+						gameRef->setQuit(true);
+						break;
+				}
+				break;
+			case SDL_KEYUP:
+				switch(evt.key.keysym.sym)
+				{
+					// whatever keys are released
+				}
+				break;
+		}
 	}
 }

@@ -6,10 +6,11 @@ class EventHandler
 	public:
 		EventHandler(Game&);
 		~EventHandler();
-		void handleEvent(SDL_Event);
+		void handleEvents();
 
 	private:
 		Game *gameRef;
+		SDL_Event evt;
 };
 
 #endif

@@ -12,10 +12,12 @@
 
 using namespace std;
 
+
 Game::Game()
 {
 	SCREEN_WIDTH = 640;
 	SCREEN_HEIGHT = 480;
+	quit = false;
 }
 
 
@@ -29,21 +31,18 @@ int Game::run()
 	}
 
 	// Initialize variables
-	quit = false;
 	float prevTime = 0;
 	EventHandler eventHandler(*this);
 
 	// MAIN LOOP
 	while (quit == false)
 	{
+		// set deltaTime (time between frames)
 		float deltaTime = (SDL_GetTicks() - prevTime) / 1000.f;
 		prevTime = SDL_GetTicks();
 
-		// Handle events (should be in a different function)
-		while (SDL_PollEvent(&evt) != 0)
-		{
-			eventHandler.handleEvent(evt);
-		}
+		// Handle events
+		eventHandler.handleEvents();
 
 		// Render
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
