@@ -12,6 +12,9 @@ class Game
 		//~Game();
 		int run();
 
+		void setQuit(bool boolIn) {quit = boolIn;}
+		bool getQuit() {return quit;}
+
 	private:
 		bool initSDL();
 		void close();
@@ -21,6 +24,7 @@ class Game
 		SDL_Renderer *renderer;
 		int SCREEN_WIDTH;
 		int SCREEN_HEIGHT;
+		bool quit;
 };
 
 #endif

@@ -79,11 +79,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="eventHandler.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="timer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="eventHandler.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="timer.h" />
   </ItemGroup>

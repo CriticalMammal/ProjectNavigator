@@ -1,7 +1,13 @@
+// File: game.cpp
+// Prog: Dylan Gallardo
+// Purp: Game initializes everything that has to do with the game.
+//		 It also is in charge of updating the main game loop.
+
 #include <SDL.h>
 #include <iostream>
 
 #include "game.h"
+#include "eventHandler.h"
 #include "timer.h"
 
 using namespace std;
@@ -23,8 +29,9 @@ int Game::run()
 	}
 
 	// Initialize variables
-	bool quit = false;
+	quit = false;
 	float prevTime = 0;
+	EventHandler eventHandler(*this);
 
 	// MAIN LOOP
 	while (quit == false)
@@ -32,15 +39,10 @@ int Game::run()
 		float deltaTime = (SDL_GetTicks() - prevTime) / 1000.f;
 		prevTime = SDL_GetTicks();
 
-		cout << "time difference: " << deltaTime << endl;
-
 		// Handle events (should be in a different function)
 		while (SDL_PollEvent(&evt) != 0)
 		{
-			if (evt.type == SDL_QUIT)
-			{
-				quit = true;
-			}
+			eventHandler.handleEvent(evt);
 		}
 
 		// Render
