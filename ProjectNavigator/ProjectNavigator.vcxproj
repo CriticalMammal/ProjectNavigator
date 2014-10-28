@@ -82,11 +82,15 @@
     <ClCompile Include="eventHandler.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="tile.cpp" />
+    <ClCompile Include="tileMap.cpp" />
     <ClCompile Include="timer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="eventHandler.h" />
     <ClInclude Include="game.h" />
+    <ClInclude Include="tile.h" />
+    <ClInclude Include="tileMap.h" />
     <ClInclude Include="timer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
