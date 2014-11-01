@@ -7,6 +7,7 @@
 
 // I DO NOT LIKE HAVING TO DO THIS
 // JUST TO DECLARE THE TILEMAP HERE
+#include <SDL_mixer.h>
 #include <vector>
 #include "tile.h"
 #include "tileMap.h"
@@ -18,6 +19,7 @@ class Game
 		//~Game();
 		int run();
 		void handleKey(SDL_Event);
+		void playPageFlip();
 
 		void setQuit(bool boolIn) {quit = boolIn;}
 		bool getQuit() {return quit;}
@@ -32,6 +34,8 @@ class Game
 		int screenWidth;
 		int screenHeight;
 		bool quit;
+		Mix_Chunk *pageFlip;
+		int channel;
 };
 
 #endif

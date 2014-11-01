@@ -29,7 +29,8 @@ TileMap::~TileMap()
 }
 
 
-void TileMap::initialize(std::string fileLocation, int rowAmt, int columnAmt, double tileWidth, double tileHeight, SDL_Renderer* renderer)
+void TileMap::initialize(std::string fileLocation, int rowAmt, int columnAmt, double tileWidth, double tileHeight, 
+						 SDL_Renderer* renderer)
 {
 	mapFileName = fileLocation;
 	x = (columnAmt*tileWidth)/8.2 - (columnAmt*tileWidth);
@@ -66,7 +67,6 @@ void TileMap::initialize(std::string fileLocation, int rowAmt, int columnAmt, do
 			// Set tile in each column
 			for (int c=0; c<columns; c++)
 			{
-
 				float tileX = tempX + c*tileW;
 				tiles[r][c]->setX(tileX);
 				tiles[r][c]->setY(tempY);

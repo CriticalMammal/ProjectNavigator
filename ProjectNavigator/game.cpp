@@ -4,6 +4,7 @@
 //		 It also is in charge of updating the main game loop.
 
 #include <SDL.h>
+#include <SDL_mixer.h>
 #include <iostream>
 #include <vector>
 
@@ -38,6 +39,16 @@ int Game::run()
 	EventHandler eventHandler(*this);
 	theMap.initialize("null", 1000, 50, 50, 50, renderer);
 
+	// Load Audio
+	pageFlip = NULL;
+	pageFlip = Mix_LoadWAV("audio/pageFlip.wav");
+	if (pageFlip == NULL)
+	{
+		cout << "Unable to load a sound. Mixer_ERROR: " << Mix_GetError() << endl;
+	}
+	Mix_VolumeChunk(pageFlip, 20);
+	channel = Mix_PlayChannel(-1, pageFlip, 0);
+
 	// MAIN LOOP
 	while (quit == false)
 	{
@@ -51,6 +62,10 @@ int Game::run()
 		// Handle game logic
 		SDL_Rect screenRect = {0, 0, screenWidth, screenHeight};
 		theMap.updateTiles();
+		if (theMap.moveDown || theMap.moveUp)
+		{
+			//channel = Mix_PlayChannel(-1, pageFlip, 0);
+		}
 
 		// Render
 		SDL_SetRenderDrawColor(renderer, 88, 232, 206, 0);
@@ -61,9 +76,11 @@ int Game::run()
 		SDL_RenderPresent(renderer);
 	}
 
+	Mix_FadeOutChannel(channel, 1000);
+	Mix_FreeChunk(pageFlip);
 	close();
 	return 0;
-}
+} // END run()
 
 
 void Game::handleKey(SDL_Event event)
@@ -111,6 +128,12 @@ void Game::handleKey(SDL_Event event)
 }
 
 
+void Game::playPageFlip()
+{
+	channel = Mix_PlayChannel(-1, pageFlip, 0);
+}
+
+
 bool Game::initSDL()
 {
 	// Initialize SDL
@@ -139,6 +162,19 @@ bool Game::initSDL()
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
+	// Init Audio Mixer
+	int audio_rate = 22050;
+	uint16_t audio_format = AUDIO_S16SYS;
+	int audio_channels = 2;
+	int audio_buffers = 4096;
+
+	if (Mix_OpenAudio(audio_rate, audio_format, audio_channels, audio_buffers) != 0)
+	{
+		cout << "Audio failed to initialize. SDL_ERROR: " << Mix_GetError() << endl;
+		return false;
+	}
+	Mix_AllocateChannels(20);
+
 	return true;
 }
 
@@ -149,6 +185,8 @@ void Game::close()
 	SDL_DestroyWindow(window);
 	renderer = nullptr;
 	window = nullptr;
+
+	Mix_CloseAudio();
 	
 	SDL_Quit();
 }

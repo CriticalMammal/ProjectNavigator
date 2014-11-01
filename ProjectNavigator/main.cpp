@@ -5,6 +5,7 @@
 //		 the program off.
 
 #include <SDL.h>
+#include <SDL_mixer.h>
 
 #include "game.h"
 
