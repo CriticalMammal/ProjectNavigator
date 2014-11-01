@@ -1,8 +1,8 @@
 // File: main.cpp
 // Prog: Dylan Gallardo
 // Purp: This initializes a new Game class, which actually handles everything
-//		 else associated with the game. This is here to start the program in
-//		 a way C++ likes.
+//		 else associated with the game. This is literally just to kick
+//		 the program off.
 
 #include <SDL.h>
 

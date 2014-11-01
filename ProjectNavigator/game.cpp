@@ -5,18 +5,21 @@
 
 #include <SDL.h>
 #include <iostream>
+#include <vector>
 
 #include "game.h"
 #include "eventHandler.h"
 #include "timer.h"
+#include "tile.h"
+#include "tileMap.h"
 
 using namespace std;
 
 
 Game::Game()
 {
-	SCREEN_WIDTH = 640;
-	SCREEN_HEIGHT = 480;
+	screenWidth = 640;
+	screenHeight = 480;
 	quit = false;
 }
 
@@ -33,6 +36,8 @@ int Game::run()
 	// Initialize variables
 	float prevTime = 0;
 	EventHandler eventHandler(*this);
+	TileMap theMap;
+	theMap.initialize("null", 5, 5, 16, 16, renderer);
 
 	// MAIN LOOP
 	while (quit == false)
@@ -44,9 +49,14 @@ int Game::run()
 		// Handle events
 		eventHandler.handleEvents();
 
+		// Handle game logic
+		SDL_Rect screenRect = {0, 0, screenWidth, screenHeight};
+
 		// Render
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 		SDL_RenderClear(renderer);
+
+		theMap.drawTileMap(screenRect, renderer);
 
 		SDL_RenderPresent(renderer);
 	}
@@ -66,7 +76,7 @@ bool Game::initSDL()
 	}
 
 	// Create window
-	window = SDL_CreateWindow("Navigator Game", 600, 40, 640, 480, SDL_WINDOW_SHOWN);
+	window = SDL_CreateWindow("Navigator Game", 600, 40, screenWidth, screenHeight, SDL_WINDOW_SHOWN);
 	if (window == false)
 	{
 		printf("SDL Window failed to init. SDL_ERROR: %s\n", SDL_GetError());

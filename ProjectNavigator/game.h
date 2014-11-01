@@ -21,8 +21,8 @@ class Game
 
 		SDL_Window *window;
 		SDL_Renderer *renderer;
-		int SCREEN_WIDTH;
-		int SCREEN_HEIGHT;
+		int screenWidth;
+		int screenHeight;
 		bool quit;
 };
 

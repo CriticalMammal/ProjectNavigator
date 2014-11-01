@@ -25,30 +25,51 @@ TileMap::TileMap()
 
 TileMap::~TileMap()
 {
-	for (int i=0; i<tiles.size(); i++)
-	{
-		tiles[i]->~Tile();
-	}
+
 }
 
 
-void TileMap::initialize(std::string fileLocation, int rowAmt, int columnAmt, double tileHeight, double tileWidth)
+void TileMap::initialize(std::string fileLocation, int rowAmt, int columnAmt, double tileWidth, double tileHeight, SDL_Renderer* renderer)
 {
-	tiles[0];
 	mapFileName = fileLocation;
+	x = 0;
+	y = 0;
 	rows = rowAmt;
 	columns = columnAmt;
 	tileH = tileHeight;
 	tileW = tileWidth;
-	//renderer = &mainRenderer;
 
 	// Try to load map, otherwise generate a new one
 	if (!loadMapFile(mapFileName))
 	{
-		//generate new map
-		for (int c=0; c<=columns*rows; c++)
+		vector<SDL_Texture*> tileTextures = loadTileSheet("tileSheet.bmp", renderer);
+		float tempX = x;
+		float tempY = y;
+
+		for (int r=0; r<rows; r++)
 		{
-			tileMap.push_back(randomNumber(1, 5)); //remember rand(1, 5) = values 1-4 NOT values 1-5
+			// Add a new row of tiles
+			vector<Tile*> newRow;
+			for (int i=0; i<columns; i++) 
+			{
+				newRow.push_back(new Tile);
+			}
+			tiles.push_back(newRow);
+
+			// Set tile in each column
+			for (int c=0; c<columns; c++)
+			{
+				float tileX = tempX + c*tileW;
+				tiles[r][c]->setX(tileX);
+				tiles[r][c]->setY(tempY);
+				tiles[r][c]->setWidth(tileW);
+				tiles[r][c]->setHeight(tileH);
+				tiles[r][c]->setTileTexture(tileTextures[0]);
+			}
+
+			//move to next row
+			tempX = x;
+			tempY += tileH;
 		}
 	}
 }
@@ -56,40 +77,15 @@ void TileMap::initialize(std::string fileLocation, int rowAmt, int columnAmt, do
 
 void TileMap::drawTileMap(SDL_Rect screenRect, SDL_Renderer *renderer)
 {
-	updateTileRects(); // Temporary, shouldn't call this from draw()
-
 	vector<int> tilesToDraw;
-	//tilesToDraw = getTilesInRect(screenRect);
-
-	for (int i=0; i<tileMap.size()-1; i++)
-	{
-		tilesToDraw.push_back(i);
-	}
-
-	if (tilesToDraw.size() <= 0)
-	{
-		return;
-	}
 
 	// Draw elements
-	for (int i=tilesToDraw.front(); i<tilesToDraw.size(); i++)
+	for (int r=0; r<tiles.size(); r++)
 	{
-			if (tileMap[i] == 1)
-			{
-				SDL_RenderCopy(renderer, tiles[0]->gettileTexture(), NULL, &tileRects[i]);
-			}
-			else if (tileMap[i] == 2)
-			{
-				SDL_RenderCopy(renderer, tiles[1]->gettileTexture(), NULL, &tileRects[i]);
-			}
-			else if (tileMap[i] == 3)
-			{
-				SDL_RenderCopy(renderer, tiles[2]->gettileTexture(), NULL, &tileRects[i]);
-			}
-			else
-			{
-				SDL_RenderCopy(renderer, tiles[3]->gettileTexture(), NULL, &tileRects[i]);
-			}
+		for (int c=0; c<tiles[r].size(); c++)
+		{
+			SDL_RenderCopy(renderer, tiles[r][c]->gettileTexture(), NULL, &tiles[r][c]->getRect());
+		}
 	}
 
 } // END draw()
@@ -100,13 +96,15 @@ void TileMap::saveMapFile()
 	ofstream externMapFile;
 	externMapFile.open("mapFile.txt");
 
+	/*
 	for (int i=0; i<tileMap.size(); i++)
 	{
 		//produces a non-human readable mess... add in a way to read 
 		//tileMap[i]+' '; later so that the output file is readable by a person
 		externMapFile << tileMap[i] << ' ';
 	}
-	
+	*/
+
 	externMapFile.close();
 }
 
@@ -150,22 +148,20 @@ bool TileMap::loadMapFile(string filePath)
 		}
 
 		mapFile.close();
+		return true;
 	}
 	else
 	{
 		// Couldn't read file
 		return false;
 	}
+}
 
-	//"tileSheet.bmp" should be a parameter in the init function
-	//to make this class more versatile
-	tileSheet = SDL_LoadBMP("tileSheet.bmp");
 
-	//load traits from txt file.
-	//"tileTraits.txt" should be a parameter in the init function
-	ifstream tileTraitFile;
-	tileTraitFile.open ("tileTraits.txt");
-
+std::vector<SDL_Texture*> TileMap::loadTileSheet (const char* tileSheetPath, SDL_Renderer* renderer)
+{
+	tileSheet = SDL_LoadBMP(tileSheetPath); //"tileSheet.bmp"
+	
 	vector<SDL_Surface*> tileSurface;
 
 	//the actual pixel width/height of tiles in tilesheet image
@@ -190,40 +186,27 @@ bool TileMap::loadMapFile(string filePath)
 		}
 	}
 
+	vector<SDL_Texture*> tileTextures;
+
 	//make all recently read tiles into textures and free surfaces
 	for (int i=0; i<tileSurface.size(); i++)
 	{
 		SDL_Texture *tempTexture = loadTexture("emptyString", tileSurface[i], renderer);
-		tiles.push_back(new Tile);
-		tiles.back()->settileTexture(tempTexture);
-
-		string traitLine;
-
-		if (tileTraitFile.is_open())
-		{
-			getline(tileTraitFile, traitLine);
-		}
-		else cout << "Unable to open file";
-
-		tiles.back()->setCollision(traitLine[0] - '0');
-		tiles.back()->setTrait1(traitLine[1] - '0');
-
-		//use this when you expand the functionality to handle longer digits than 0-9
-		//cout << atoi(traitLine.c_str()) << endl << endl;
+		tileTextures.push_back(tempTexture);
 	}
-
-	tileTraitFile.close();
 
 	for (int i=tileSurface.size()-1; i<=0; i=tileSurface.size()-1)
 	{
 		SDL_FreeSurface(tileSurface[i]);
 	}
-}
+
+	return tileTextures;
+
+} // END loadTileTexture()
 
 
 SDL_Texture* TileMap::loadTexture (std::string path, SDL_Surface *currentSurface, SDL_Renderer *renderer)
 {
-
 	//final image
 	SDL_Texture* newTexture = nullptr;
 
@@ -239,7 +222,6 @@ SDL_Texture* TileMap::loadTexture (std::string path, SDL_Surface *currentSurface
 		loadedSurface = currentSurface;
 	}
 	
-
 	if (!loadedSurface)
 	{
 		cout << "Failed to load image " << path.c_str() << ". SDL_Error: " << SDL_GetError() << endl;
