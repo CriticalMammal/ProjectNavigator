@@ -5,12 +5,19 @@
 #ifndef GAME_H
 #define GAME_H
 
+// I DO NOT LIKE HAVING TO DO THIS
+// JUST TO DECLARE THE TILEMAP HERE
+#include <vector>
+#include "tile.h"
+#include "tileMap.h"
+
 class Game
 {
 	public:
 		Game();
 		//~Game();
 		int run();
+		void handleKey(SDL_Event);
 
 		void setQuit(bool boolIn) {quit = boolIn;}
 		bool getQuit() {return quit;}
@@ -21,6 +28,7 @@ class Game
 
 		SDL_Window *window;
 		SDL_Renderer *renderer;
+		TileMap theMap;
 		int screenWidth;
 		int screenHeight;
 		bool quit;

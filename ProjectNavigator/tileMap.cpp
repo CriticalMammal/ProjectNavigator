@@ -32,12 +32,19 @@ TileMap::~TileMap()
 void TileMap::initialize(std::string fileLocation, int rowAmt, int columnAmt, double tileWidth, double tileHeight, SDL_Renderer* renderer)
 {
 	mapFileName = fileLocation;
-	x = 0;
-	y = 0;
+	x = (columnAmt*tileWidth)/8.2 - (columnAmt*tileWidth);
+	y = 150;
 	rows = rowAmt;
 	columns = columnAmt;
 	tileH = tileHeight;
 	tileW = tileWidth;
+	centerRow = rows/2;
+	maxRowsDisplayed = 100;
+
+	moveUp = false;
+	moveDown = false;
+	moveRight = false;
+	moveLeft = false;
 
 	// Try to load map, otherwise generate a new one
 	if (!loadMapFile(mapFileName))
@@ -59,12 +66,14 @@ void TileMap::initialize(std::string fileLocation, int rowAmt, int columnAmt, do
 			// Set tile in each column
 			for (int c=0; c<columns; c++)
 			{
+
 				float tileX = tempX + c*tileW;
 				tiles[r][c]->setX(tileX);
 				tiles[r][c]->setY(tempY);
+				tiles[r][c]->setZ(1);
 				tiles[r][c]->setWidth(tileW);
 				tiles[r][c]->setHeight(tileH);
-				tiles[r][c]->setTileTexture(tileTextures[0]);
+				tiles[r][c]->setTileTexture(tileTextures[randomNumber(0, 890)/100]);
 			}
 
 			//move to next row
@@ -75,12 +84,71 @@ void TileMap::initialize(std::string fileLocation, int rowAmt, int columnAmt, do
 }
 
 
+void TileMap::updateTiles()
+{
+	if (moveUp)
+	{
+		if (centerRow > 0)
+		{
+			centerRow --;
+		}
+	}
+	else if (moveDown)
+	{
+		centerRow ++;
+	}
+
+	if (moveLeft)
+	{
+		x += 20;
+	}
+	else if (moveRight)
+	{
+		x -= 20;
+	}
+
+	int startRow = centerRow-(maxRowsDisplayed/2);
+	if (startRow < 0) {startRow = 0;}
+	int endRow = startRow + maxRowsDisplayed;
+	if (endRow > rows) {endRow = rows;}
+
+	float originalWidth = x + tileW*columns;
+	int sizeFactor = 20;
+
+	for (int r=startRow; r<endRow; r++)
+	{
+		float distFromCenter = r - centerRow;
+		distFromCenter /= sizeFactor;
+		float newWidth = x + (tileW*distFromCenter)*columns;
+		float newX = x - ((newWidth - originalWidth)/2);
+
+		// Set tile in each column
+		for (int c=0; c<columns; c++)
+		{
+			// Calculate what the z axis should be
+			distFromCenter = r-centerRow;
+			
+			tiles[r][c]->setY(y+(distFromCenter*distFromCenter));
+
+			distFromCenter = distFromCenter/sizeFactor;
+			tiles[r][c]->setZ(1+distFromCenter);
+			tiles[r][c]->setX(newX + (tileW+(tileW*distFromCenter))*c);
+
+			tiles[r][c]->updateTile();
+		}
+	}
+}
+
+
 void TileMap::drawTileMap(SDL_Rect screenRect, SDL_Renderer *renderer)
 {
-	vector<int> tilesToDraw;
+	int startRow = centerRow-(maxRowsDisplayed/2);
+	if (startRow < 0) {startRow = 0;}
+	int endRow = startRow + maxRowsDisplayed;
+	if (endRow > rows) {endRow = rows;}
 
 	// Draw elements
-	for (int r=0; r<tiles.size(); r++)
+	for (int r=startRow; r<endRow; r++)
 	{
 		for (int c=0; c<tiles[r].size(); c++)
 		{

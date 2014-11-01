@@ -33,18 +33,10 @@ void EventHandler::handleEvents()
 				gameRef->setQuit(true);
 				break;
 			case SDL_KEYDOWN:
-				switch(evt.key.keysym.sym)
-				{
-					case SDLK_ESCAPE:
-						gameRef->setQuit(true);
-						break;
-				}
+				gameRef->handleKey(evt);
 				break;
 			case SDL_KEYUP:
-				switch(evt.key.keysym.sym)
-				{
-					// whatever keys are released
-				}
+				gameRef->handleKey(evt);
 				break;
 		}
 	}

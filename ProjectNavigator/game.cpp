@@ -7,11 +7,11 @@
 #include <iostream>
 #include <vector>
 
-#include "game.h"
-#include "eventHandler.h"
 #include "timer.h"
 #include "tile.h"
 #include "tileMap.h"
+#include "game.h"
+#include "eventHandler.h"
 
 using namespace std;
 
@@ -36,8 +36,7 @@ int Game::run()
 	// Initialize variables
 	float prevTime = 0;
 	EventHandler eventHandler(*this);
-	TileMap theMap;
-	theMap.initialize("null", 5, 5, 16, 16, renderer);
+	theMap.initialize("null", 1000, 50, 50, 50, renderer);
 
 	// MAIN LOOP
 	while (quit == false)
@@ -51,9 +50,10 @@ int Game::run()
 
 		// Handle game logic
 		SDL_Rect screenRect = {0, 0, screenWidth, screenHeight};
+		theMap.updateTiles();
 
 		// Render
-		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+		SDL_SetRenderDrawColor(renderer, 88, 232, 206, 0);
 		SDL_RenderClear(renderer);
 
 		theMap.drawTileMap(screenRect, renderer);
@@ -63,6 +63,51 @@ int Game::run()
 
 	close();
 	return 0;
+}
+
+
+void Game::handleKey(SDL_Event event)
+{
+	switch (event.type)
+	{
+		case SDL_KEYDOWN:
+			switch(event.key.keysym.sym)
+			{
+				case SDLK_ESCAPE:
+					quit = true;
+					break;
+				case SDLK_UP:
+					theMap.moveUp = true;
+					break;
+				case SDLK_DOWN:
+					theMap.moveDown = true;
+					break;
+				case SDLK_RIGHT:
+					theMap.moveRight = true;
+					break;
+				case SDLK_LEFT:
+					theMap.moveLeft = true;
+					break;
+			}
+			break;
+		case SDL_KEYUP:
+			switch(event.key.keysym.sym)
+			{
+				case SDLK_UP:
+					theMap.moveUp = false;
+					break;
+				case SDLK_DOWN:
+					theMap.moveDown = false;
+					break;
+				case SDLK_RIGHT:
+					theMap.moveRight = false;
+					break;
+				case SDLK_LEFT:
+					theMap.moveLeft = false;
+					break;
+			}
+			break;
+	}
 }
 
 
