@@ -34,13 +34,14 @@ void TileMap::initialize(std::string fileLocation, int rowAmt, int columnAmt, do
 {
 	mapFileName = fileLocation;
 	x = (columnAmt*tileWidth)/8.2 - (columnAmt*tileWidth);
+	oldX = x;
 	y = 150;
 	rows = rowAmt;
 	columns = columnAmt;
 	tileH = tileHeight;
 	tileW = tileWidth;
 	centerRow = rows/2;
-	maxRowsDisplayed = 100;
+	maxRowsDisplayed = 200;
 
 	moveUp = false;
 	moveDown = false;
@@ -58,7 +59,7 @@ void TileMap::initialize(std::string fileLocation, int rowAmt, int columnAmt, do
 		{
 			// Add a new row of tiles
 			vector<Tile*> newRow;
-			for (int i=0; i<columns; i++) 
+			for (int i=0; i<columns; i++)
 			{
 				newRow.push_back(new Tile);
 			}
@@ -86,6 +87,7 @@ void TileMap::initialize(std::string fileLocation, int rowAmt, int columnAmt, do
 
 void TileMap::updateTiles()
 {
+	//x = oldX;
 	if (moveUp)
 	{
 		if (centerRow > 0)
@@ -95,25 +97,28 @@ void TileMap::updateTiles()
 	}
 	else if (moveDown)
 	{
-		centerRow ++;
+		if (centerRow < rows)
+		{
+			centerRow ++;
+		}
 	}
 
 	if (moveLeft)
 	{
-		x += 20;
+		x += tileW + (tileW*0.525);
 	}
 	else if (moveRight)
 	{
-		x -= 20;
+		x -= tileW + (tileW*0.525);
 	}
-
+	
 	int startRow = centerRow-(maxRowsDisplayed/2);
 	if (startRow < 0) {startRow = 0;}
 	int endRow = startRow + maxRowsDisplayed;
 	if (endRow > rows) {endRow = rows;}
 
 	float originalWidth = x + tileW*columns;
-	int sizeFactor = 20;
+	int sizeFactor = 40;
 
 	for (int r=startRow; r<endRow; r++)
 	{
@@ -128,7 +133,7 @@ void TileMap::updateTiles()
 			// Calculate what the z axis should be
 			distFromCenter = r-centerRow;
 			
-			tiles[r][c]->setY(y+(distFromCenter*distFromCenter));
+			tiles[r][c]->setY(y+(distFromCenter*(distFromCenter/2)));
 
 			distFromCenter = distFromCenter/sizeFactor;
 			tiles[r][c]->setZ(1+distFromCenter);

@@ -19,10 +19,12 @@ class TileMap
 		double getY() {return y;}
 		double getTileW() {return tileW;}
 		double getTileH() {return tileH;}
+		int getRowCount() {return rows;}
+		int getColumnCount() {return columns;}
 		int getCenterRow() {return centerRow;}
 
-		void setX(int newX) {x = newX;}
-		void setY(int newY) {y = newY;}
+		void setX(double newX) {x = newX;}
+		void setY(double newY) {y = newY;}
 		void setCenterRow(int newRow) {centerRow = newRow;}
 
 	private:
@@ -32,6 +34,7 @@ class TileMap
 		int rows, columns;
 		int centerRow, maxRowsDisplayed;
 		double x, y, tileH, tileW;
+		double oldX;
 		
 		std::vector<SDL_Texture*> loadTileSheet(const char*, SDL_Renderer*);
 		SDL_Texture* loadTexture(std::string, SDL_Surface*, SDL_Renderer* renderer);

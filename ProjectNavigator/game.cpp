@@ -22,6 +22,7 @@ Game::Game()
 	screenWidth = 640;
 	screenHeight = 480;
 	quit = false;
+	smoothScroll = false;
 }
 
 
@@ -42,12 +43,18 @@ int Game::run()
 	// Load Audio
 	pageFlip = NULL;
 	pageFlip = Mix_LoadWAV("audio/pageFlip.wav");
+	bgMusic = NULL;
+	bgMusic = Mix_LoadWAV("audio/Broadcast-Misc.wav");
 	if (pageFlip == NULL)
 	{
 		cout << "Unable to load a sound. Mixer_ERROR: " << Mix_GetError() << endl;
 	}
+	else if (bgMusic == NULL)
+	{
+		cout << "Unable to load a sound. Mixer_ERROR: " << Mix_GetError() << endl;
+	}
 	Mix_VolumeChunk(pageFlip, 20);
-	channel = Mix_PlayChannel(-1, pageFlip, 0);
+	channel = Mix_PlayChannel(-1, bgMusic, -1);
 
 	// MAIN LOOP
 	while (quit == false)
@@ -66,6 +73,7 @@ int Game::run()
 		{
 			//channel = Mix_PlayChannel(-1, pageFlip, 0);
 		}
+		SDL_Rect playerRect = {330, 350, 20, 20};
 
 		// Render
 		SDL_SetRenderDrawColor(renderer, 88, 232, 206, 0);
@@ -73,11 +81,22 @@ int Game::run()
 
 		theMap.drawTileMap(screenRect, renderer);
 
+		SDL_SetRenderDrawColor(renderer, 20, 50, 50, 255);
+		SDL_RenderFillRect(renderer, &playerRect);
+
 		SDL_RenderPresent(renderer);
 	}
 
-	Mix_FadeOutChannel(channel, 1000);
+	Mix_FadeOutChannel(channel, 2000);
+	while (Mix_FadingChannel(channel))
+	{
+		SDL_Rect screenRect = {0, 0, screenWidth, screenHeight};
+		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 5);
+		SDL_RenderFillRect(renderer, &screenRect);
+		SDL_RenderPresent(renderer);
+	}
 	Mix_FreeChunk(pageFlip);
+	Mix_FreeChunk(bgMusic);
 	close();
 	return 0;
 } // END run()
@@ -94,17 +113,53 @@ void Game::handleKey(SDL_Event event)
 					quit = true;
 					break;
 				case SDLK_UP:
-					theMap.moveUp = true;
+					if (smoothScroll)
+					{
+						theMap.moveUp = true;
+					}
+					else
+					{
+						if (theMap.getCenterRow() > 0)
+						{
+							theMap.setCenterRow(theMap.getCenterRow()-1);
+						}	
+					}
 					break;
 				case SDLK_DOWN:
-					theMap.moveDown = true;
+					if (smoothScroll)
+					{
+						theMap.moveDown = true;
+					}
+					else
+					{
+						if (theMap.getCenterRow() < theMap.getRowCount())
+						{
+							theMap.setCenterRow(theMap.getCenterRow()+1);
+						}
+					}
 					break;
 				case SDLK_RIGHT:
-					theMap.moveRight = true;
+					if (smoothScroll)
+					{
+						theMap.moveRight = true;
+					}
+					else
+					{
+						theMap.setX(theMap.getX() - 76.25);
+					}
 					break;
 				case SDLK_LEFT:
-					theMap.moveLeft = true;
+					if (smoothScroll)
+					{
+						theMap.moveLeft = true;
+					}
+					else
+					{
+						theMap.setX(theMap.getX() + 76.25);
+					}
 					break;
+				case SDLK_s:
+					smoothScroll = !smoothScroll;
 			}
 			break;
 		case SDL_KEYUP:
