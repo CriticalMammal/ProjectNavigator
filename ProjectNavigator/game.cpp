@@ -40,7 +40,7 @@ int Game::run()
 	// Initialize variables
 	float prevTime = 0;
 	EventHandler eventHandler(*this);
-	theMap.generateNewMap(1000, 3, 50, 50, 50, renderer);
+	theMap.generateNewMap(1000, 3, 30, 50, 50, renderer);
 
 	// Load Audio
 	pageFlip = NULL;

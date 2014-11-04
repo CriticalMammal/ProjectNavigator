@@ -51,12 +51,11 @@ bool TileMap::generateMap(int rowAmt, int columnAmt, double tileWidth, double ti
 			newRow.push_back(new Tile);
 		}
 		tiles.push_back(newRow);
-
 		// Set tile in each column
 		for (int c=0; c<columns; c++)
 		{
 			// Hard to read if statement that basically creates towering block structures
-			if (r == rows-1 || randomNumber(0, 100) < 1 || r!= 0 && tiles[r-1][c]->getEmpty() == false)
+			if (r == rows-1 || (int) randomNumber(1, 200) == 1 || r!= 0 && tiles[r-1][c]->getEmpty() == false)
 			{
 				float tileX = tempX + c*tileW;
 				tiles[r][c]->setX(tileX);
@@ -64,7 +63,14 @@ bool TileMap::generateMap(int rowAmt, int columnAmt, double tileWidth, double ti
 				tiles[r][c]->setZ(1);
 				tiles[r][c]->setWidth(tileW);
 				tiles[r][c]->setHeight(tileH);
-				tiles[r][c]->setTileTexture(tileTextures[randomNumber(0, 890)/100]);
+				if (r == rows-1)
+				{
+					tiles[r][c]->setTileTexture(tileTextures[randomNumber(0, 8)]);
+				}
+				else // It's cactus time
+				{
+					tiles[r][c]->setTileTexture(tileTextures[randomNumber(9, 12)]);
+				}
 			}
 			else
 			{
@@ -99,11 +105,13 @@ void TileMap::updateTiles()
 		// Set tile in each column
 		for (int c=0; c<columns; c++)
 		{
-			//tiles[r][c]->setX(tempX + (tileW + (tileW * distFromCenter)) * c);
-			tiles[r][c]->setX(tempX + (tileW + (tileW * z) * c));
-			tiles[r][c]->setY(tempY);
-			tiles[r][c]->setZ(z);
-			tiles[r][c]->updateTile();
+			if (tiles[r][c]->getEmpty() == false) // Don't update empty tiles
+			{
+				tiles[r][c]->setX(tempX + (tileW + (tileW * z) * c));
+				tiles[r][c]->setY(tempY);
+				tiles[r][c]->setZ(z);
+				tiles[r][c]->updateTile();
+			}
 		}
 
 		tempY -= tileH*z;
@@ -118,7 +126,7 @@ void TileMap::drawTileMap(SDL_Rect screenRect, SDL_Renderer *renderer)
 	{
 		for (int c=0; c<columns; c++)
 		{
-			if (tiles[r][c]->getEmpty() == false)
+			if (tiles[r][c]->getEmpty() == false) // Don't draw empty tiles
 			{
 				SDL_RenderCopy(renderer, tiles[r][c]->gettileTexture(), NULL, &tiles[r][c]->getRect());
 			}
