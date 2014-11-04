@@ -4,6 +4,7 @@
 //		 It also is in charge of updating the main game loop.
 
 #include <SDL.h>
+#include <SDL_image.h>
 #include <SDL_mixer.h>
 #include <iostream>
 #include <vector>
@@ -217,6 +218,15 @@ bool Game::initSDL()
 
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+
+	// Init SDL_Image
+    int flags = IMG_INIT_JPG | IMG_INIT_PNG;
+    int initted = IMG_Init(flags);
+    if( initted & flags != flags) 
+	{
+        cout<<"could not init SDL_Image" << endl;
+        cout<<"Reason: " << IMG_GetError() << endl;
+    }
 
 	// Init Audio Mixer
 	int audio_rate = 22050;

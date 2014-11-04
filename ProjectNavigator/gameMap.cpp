@@ -6,6 +6,7 @@
 //		 to specific layer and tile properties.
 
 #include <SDL.h>
+#include <SDL_image.h>
 #include <fstream> //is a part of <stdio>?
 #include <iostream>
 #include <sstream>
@@ -48,7 +49,7 @@ GameMap::~GameMap()
 bool GameMap::generateNewMap(int layerCountIn, int layerRowAmt, int layerColumnAmt,
 			double tileWidth, double tileHeight, SDL_Renderer* renderer)
 {
-	tileTextures = loadTileSheet("tileSheet.bmp", renderer); //test for errors
+	tileTextures = loadTileSheet("tileSheet.png", renderer); //test for errors
 	x = -1700;
 	y = 200;
 	float tempX = x;
@@ -79,7 +80,7 @@ bool GameMap::generateNewMap(int layerCountIn, int layerRowAmt, int layerColumnA
 
 bool GameMap::loadMap(std::string filePath, SDL_Renderer* renderer)
 {
-	tileTextures = loadTileSheet("tileSheet.bmp", renderer);
+	tileTextures = loadTileSheet("tileSheet.png", renderer);
 
 	ifstream mapFile(filePath);
 	
@@ -209,7 +210,7 @@ void GameMap::drawMap(SDL_Rect screenRect, SDL_Renderer* renderer)
 
 std::vector<SDL_Texture*> GameMap::loadTileSheet (const char* tileSheetPath, SDL_Renderer* renderer)
 {
-	SDL_Surface* tileSheet = SDL_LoadBMP(tileSheetPath);
+	SDL_Surface* tileSheet = IMG_Load(tileSheetPath);
 	
 	vector<SDL_Surface*> tileSurface;
 
@@ -223,7 +224,7 @@ std::vector<SDL_Texture*> GameMap::loadTileSheet (const char* tileSheetPath, SDL
 		for (int w=0; w<tileSheet->w; w+=importWidth)
 		{
 			// You needed to load a temporary tile in order for
-			SDL_Surface *tempSurface = SDL_LoadBMP("tempTile.bmp");
+			SDL_Surface *tempSurface = IMG_Load("tempTile.png");
 			tileSurface.push_back(tempSurface);
 
 			SDL_Rect clip = {w, h, importWidth, importHeight};
