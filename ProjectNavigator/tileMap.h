@@ -6,38 +6,34 @@ class TileMap
 	public:
 		TileMap();
 		~TileMap();
-		bool moveUp, moveDown, moveLeft, moveRight;
 
-		void initialize(std::string fileLocation, int rowAmt, int columnAmt, double tileWidth, double tileHeight, SDL_Renderer*);
 		void updateTiles();
 		void drawTileMap(SDL_Rect, SDL_Renderer* renderer);
 
 		void saveMapFile();
-		bool loadMapFile(std::string);
+		bool loadMap(std::vector<std::string>);
+		bool generateMap(int rowAmt, int columnAmt, double tileWidth, double tileHeight, std::vector<SDL_Texture*>);
 
 		double getX() {return x;}
 		double getY() {return y;}
+		double getZ() {return z;}
 		double getTileW() {return tileW;}
 		double getTileH() {return tileH;}
 		int getRowCount() {return rows;}
 		int getColumnCount() {return columns;}
-		int getCenterRow() {return centerRow;}
 
 		void setX(double newX) {x = newX;}
 		void setY(double newY) {y = newY;}
-		void setCenterRow(int newRow) {centerRow = newRow;}
+		void setZ(double newZ) {z = newZ;}
+		void setDistFromCenter(int newDist) {distFromCenter = newDist;}
 
 	private:
-		SDL_Surface *tileSheet;
 		std::vector< std::vector<Tile*> > tiles;
-		std::string mapFileName;
+		std::vector<std::string> mapData;
 		int rows, columns;
-		int centerRow, maxRowsDisplayed;
-		double x, y, tileH, tileW;
-		double oldX;
+		int distFromCenter;
+		double x, y, z, tileH, tileW;
 		
-		std::vector<SDL_Texture*> loadTileSheet(const char*, SDL_Renderer*);
-		SDL_Texture* loadTexture(std::string, SDL_Surface*, SDL_Renderer* renderer);
 		int convertStringToInt(std::string);
 		float randomNumber(float, float);
 };

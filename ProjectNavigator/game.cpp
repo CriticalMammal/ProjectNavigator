@@ -11,6 +11,7 @@
 #include "timer.h"
 #include "tile.h"
 #include "tileMap.h"
+#include "gameMap.h"
 #include "game.h"
 #include "eventHandler.h"
 
@@ -38,7 +39,7 @@ int Game::run()
 	// Initialize variables
 	float prevTime = 0;
 	EventHandler eventHandler(*this);
-	theMap.initialize("null", 1000, 50, 50, 50, renderer);
+	theMap.generateNewMap(1000, 3, 50, 50, 50, renderer);
 
 	// Load Audio
 	pageFlip = NULL;
@@ -68,7 +69,7 @@ int Game::run()
 
 		// Handle game logic
 		SDL_Rect screenRect = {0, 0, screenWidth, screenHeight};
-		theMap.updateTiles();
+		theMap.updateMap();
 		if (theMap.moveDown || theMap.moveUp)
 		{
 			//channel = Mix_PlayChannel(-1, pageFlip, 0);
@@ -79,7 +80,7 @@ int Game::run()
 		SDL_SetRenderDrawColor(renderer, 88, 232, 206, 0);
 		SDL_RenderClear(renderer);
 
-		theMap.drawTileMap(screenRect, renderer);
+		theMap.drawMap(screenRect, renderer);
 
 		SDL_SetRenderDrawColor(renderer, 20, 50, 50, 255);
 		SDL_RenderFillRect(renderer, &playerRect);
@@ -119,9 +120,9 @@ void Game::handleKey(SDL_Event event)
 					}
 					else
 					{
-						if (theMap.getCenterRow() > 0)
+						if (theMap.getCenterLayer() > 0)
 						{
-							theMap.setCenterRow(theMap.getCenterRow()-1);
+							theMap.setCenterLayer(theMap.getCenterLayer()-1);
 						}	
 					}
 					break;
@@ -132,9 +133,9 @@ void Game::handleKey(SDL_Event event)
 					}
 					else
 					{
-						if (theMap.getCenterRow() < theMap.getRowCount())
+						if (theMap.getCenterLayer() < theMap.getLayerCount()-1)
 						{
-							theMap.setCenterRow(theMap.getCenterRow()+1);
+							theMap.setCenterLayer(theMap.getCenterLayer()+1);
 						}
 					}
 					break;

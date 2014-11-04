@@ -11,6 +11,7 @@
 #include <vector>
 #include "tile.h"
 #include "tileMap.h"
+#include "gameMap.h"
 
 class Game
 {
@@ -30,7 +31,7 @@ class Game
 
 		SDL_Window *window;
 		SDL_Renderer *renderer;
-		TileMap theMap;
+		GameMap theMap;
 		int screenWidth;
 		int screenHeight;
 		bool quit;

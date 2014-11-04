@@ -20,6 +20,7 @@ class Tile
 		void setZ(float newZ) {goalZ = newZ;}
 		void setWidth(float newW) {width = newW;}
 		void setHeight(float newH) {height = newH;}
+		void setEmpty(bool boolIn) {empty = boolIn;}
 
 		//get functions
 		bool getCollision() {return collision;}
@@ -30,6 +31,7 @@ class Tile
 		float getZ() {return goalZ;}
 		float getWidth() {return width;}
 		float getHeight() {return height;}
+		bool getEmpty() {return empty;}
 
 	private:
 		TileType type;
@@ -39,6 +41,7 @@ class Tile
 		float goalX, goalY, goalZ;
 		float xLerp, yLerp, zLerp;
 		float width, height;
+		bool empty;
 
 		float lerp(float, float, float);
 };

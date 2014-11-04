@@ -29,44 +29,34 @@ TileMap::~TileMap()
 }
 
 
-void TileMap::initialize(std::string fileLocation, int rowAmt, int columnAmt, double tileWidth, double tileHeight, 
-						 SDL_Renderer* renderer)
+bool TileMap::generateMap(int rowAmt, int columnAmt, double tileWidth, double tileHeight, 
+						 std::vector<SDL_Texture*> tileTextures)
 {
-	mapFileName = fileLocation;
-	x = (columnAmt*tileWidth)/8.2 - (columnAmt*tileWidth);
-	oldX = x;
-	y = 150;
+	x = 0;
+	y = 0;
 	rows = rowAmt;
 	columns = columnAmt;
 	tileH = tileHeight;
 	tileW = tileWidth;
-	centerRow = rows/2;
-	maxRowsDisplayed = 200;
 
-	moveUp = false;
-	moveDown = false;
-	moveRight = false;
-	moveLeft = false;
+	float tempX = x;
+	float tempY = y;
 
-	// Try to load map, otherwise generate a new one
-	if (!loadMapFile(mapFileName))
+	for (int r=0; r<rows; r++)
 	{
-		vector<SDL_Texture*> tileTextures = loadTileSheet("tileSheet.bmp", renderer);
-		float tempX = x;
-		float tempY = y;
-
-		for (int r=0; r<rows; r++)
+		// Add a new row of tiles
+		vector<Tile*> newRow;
+		for (int i=0; i<columns; i++)
 		{
-			// Add a new row of tiles
-			vector<Tile*> newRow;
-			for (int i=0; i<columns; i++)
-			{
-				newRow.push_back(new Tile);
-			}
-			tiles.push_back(newRow);
+			newRow.push_back(new Tile);
+		}
+		tiles.push_back(newRow);
 
-			// Set tile in each column
-			for (int c=0; c<columns; c++)
+		// Set tile in each column
+		for (int c=0; c<columns; c++)
+		{
+			// Hard to read if statement that basically creates towering block structures
+			if (r == rows-1 || randomNumber(0, 100) < 1 || r!= 0 && tiles[r-1][c]->getEmpty() == false)
 			{
 				float tileX = tempX + c*tileW;
 				tiles[r][c]->setX(tileX);
@@ -76,91 +66,64 @@ void TileMap::initialize(std::string fileLocation, int rowAmt, int columnAmt, do
 				tiles[r][c]->setHeight(tileH);
 				tiles[r][c]->setTileTexture(tileTextures[randomNumber(0, 890)/100]);
 			}
-
-			//move to next row
-			tempX = x;
-			tempY += tileH;
+			else
+			{
+				tiles[r][c]->setEmpty(true);
+			}
 		}
+
+		//move to next row
+		tempX = x;
+		tempY += tileH;
 	}
-}
+
+	return true;
+} // END generateMap
+
+
+bool TileMap::loadMap(vector<string> mapDataStr)
+{
+	return false;
+} // END loadMap
 
 
 void TileMap::updateTiles()
 {
-	//x = oldX;
-	if (moveUp)
-	{
-		if (centerRow > 0)
-		{
-			centerRow --;
-		}
-	}
-	else if (moveDown)
-	{
-		if (centerRow < rows)
-		{
-			centerRow ++;
-		}
-	}
+	double tempX = x;
+	double tempY = y;
 
-	if (moveLeft)
+	// Update tiles in reverse, so that they stack as expected
+	// (not ideal, I'd prefer changing this later)
+	for (int r = rows-1; r>=0; r--)
 	{
-		x += tileW + (tileW*0.525);
-	}
-	else if (moveRight)
-	{
-		x -= tileW + (tileW*0.525);
-	}
-	
-	int startRow = centerRow-(maxRowsDisplayed/2);
-	if (startRow < 0) {startRow = 0;}
-	int endRow = startRow + maxRowsDisplayed;
-	if (endRow > rows) {endRow = rows;}
-
-	float originalWidth = x + tileW*columns;
-	int sizeFactor = 40;
-
-	for (int r=startRow; r<endRow; r++)
-	{
-		float distFromCenter = r - centerRow;
-		distFromCenter /= sizeFactor;
-		float newWidth = x + (tileW*distFromCenter)*columns;
-		float newX = x - ((newWidth - originalWidth)/2);
-
 		// Set tile in each column
 		for (int c=0; c<columns; c++)
 		{
-			// Calculate what the z axis should be
-			distFromCenter = r-centerRow;
-			
-			tiles[r][c]->setY(y+(distFromCenter*(distFromCenter/2)));
-
-			distFromCenter = distFromCenter/sizeFactor;
-			tiles[r][c]->setZ(1+distFromCenter);
-			tiles[r][c]->setX(newX + (tileW+(tileW*distFromCenter))*c);
-
+			//tiles[r][c]->setX(tempX + (tileW + (tileW * distFromCenter)) * c);
+			tiles[r][c]->setX(tempX + (tileW + (tileW * z) * c));
+			tiles[r][c]->setY(tempY);
+			tiles[r][c]->setZ(z);
 			tiles[r][c]->updateTile();
 		}
+
+		tempY -= tileH*z;
 	}
-}
+} // END updateTiles()
 
 
 void TileMap::drawTileMap(SDL_Rect screenRect, SDL_Renderer *renderer)
 {
-	int startRow = centerRow-(maxRowsDisplayed/2);
-	if (startRow < 0) {startRow = 0;}
-	int endRow = startRow + maxRowsDisplayed;
-	if (endRow > rows) {endRow = rows;}
-
 	// Draw elements
-	for (int r=startRow; r<endRow; r++)
+	for (int r=0; r<rows; r++)
 	{
-		for (int c=0; c<tiles[r].size(); c++)
+		for (int c=0; c<columns; c++)
 		{
-			SDL_RenderCopy(renderer, tiles[r][c]->gettileTexture(), NULL, &tiles[r][c]->getRect());
+			if (tiles[r][c]->getEmpty() == false)
+			{
+				SDL_RenderCopy(renderer, tiles[r][c]->gettileTexture(), NULL, &tiles[r][c]->getRect());
+			}
 		}
 	}
-
 } // END draw()
 
 
@@ -180,139 +143,6 @@ void TileMap::saveMapFile()
 
 	externMapFile.close();
 }
-
-
-bool TileMap::loadMapFile(string filePath)
-{
-	ifstream mapFile(filePath);
-	
-	if (mapFile.is_open())
-	{
-		// You'll need to seperate most of this into something like
-		// the CabRecordReaper, to simplify this section and allow
-		// you to read each line and create tiles from them.
-		std::vector<int> tileIntLine;
-
-		// Read a line of the file
-		while (mapFile)
-		{
-			string recordLine;
-			
-			if (!getline( mapFile, recordLine))
-			{
-				break;
-			}
-
-			// Break up line into parts
-			istringstream strStream(recordLine);
-
-			while(strStream)
-			{
-				string recordPart;
-				if (!getline(strStream, recordPart, ','))
-				{
-					break;
-				}
-				
-				// Create a convertStringToInt function
-				int partValue = convertStringToInt(recordPart);
-				tileIntLine.push_back(partValue);
-			}
-		}
-
-		mapFile.close();
-		return true;
-	}
-	else
-	{
-		// Couldn't read file
-		return false;
-	}
-}
-
-
-std::vector<SDL_Texture*> TileMap::loadTileSheet (const char* tileSheetPath, SDL_Renderer* renderer)
-{
-	tileSheet = SDL_LoadBMP(tileSheetPath); //"tileSheet.bmp"
-	
-	vector<SDL_Surface*> tileSurface;
-
-	//the actual pixel width/height of tiles in tilesheet image
-	int importHeight = 16;
-	int importWidth = 16;
-
-	//load the tile sheet into seperate surfaces
-	for (int h=0; h<tileSheet->h; h+=importHeight)
-	{
-		for (int w=0; w<tileSheet->w; w+=importWidth)
-		{
-			// You needed to load a temporary tile in order for
-			SDL_Surface *tempSurface = SDL_LoadBMP("tempTile.bmp");
-			tileSurface.push_back(tempSurface);
-
-			SDL_Rect clip = {w, h, importWidth, importHeight};
-
-			if (SDL_BlitSurface(tileSheet, &clip, tileSurface.back(), NULL) != 0)
-			{
-				cout << "Error, SDL_Blit failed: " << SDL_GetError() << endl;
-			}
-		}
-	}
-
-	vector<SDL_Texture*> tileTextures;
-
-	//make all recently read tiles into textures and free surfaces
-	for (int i=0; i<tileSurface.size(); i++)
-	{
-		SDL_Texture *tempTexture = loadTexture("emptyString", tileSurface[i], renderer);
-		tileTextures.push_back(tempTexture);
-	}
-
-	for (int i=tileSurface.size()-1; i<=0; i=tileSurface.size()-1)
-	{
-		SDL_FreeSurface(tileSurface[i]);
-	}
-
-	return tileTextures;
-
-} // END loadTileTexture()
-
-
-SDL_Texture* TileMap::loadTexture (std::string path, SDL_Surface *currentSurface, SDL_Renderer *renderer)
-{
-	//final image
-	SDL_Texture* newTexture = nullptr;
-
-	//Load Image at specified path OR use currentSurface if available
-	SDL_Surface* loadedSurface;
-
-	if (!currentSurface)
-	{
-		loadedSurface = SDL_LoadBMP(path.c_str());
-	}
-	else
-	{
-		loadedSurface = currentSurface;
-	}
-	
-	if (!loadedSurface)
-	{
-		cout << "Failed to load image " << path.c_str() << ". SDL_Error: " << SDL_GetError() << endl;
-	}
-	else
-	{
-		//convert surface to screen format
-		if (!(newTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface)))
-		{
-			cout << "Failed to create texture " << path.c_str() << ". SDL_Error: " << SDL_GetError() << endl;
-		}
-
-		//free old loaded surface
-		SDL_FreeSurface(loadedSurface);
-	}
-
-	return newTexture;
-} //END loadSurface()
 
 
 // Untested!!!

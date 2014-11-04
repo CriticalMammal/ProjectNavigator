@@ -8,6 +8,7 @@ using namespace std;
 Tile::Tile()
 {
 	collision = false;
+	empty = false;
 	type = None;
 	tileTexture = NULL;
 
@@ -48,6 +49,7 @@ void Tile::updateTile()
 
 	float newX = lerp(x, xLerp, goalX);
 	x = newX;
+	//x = goalX;
 
 	// Update y
 	if (y != goalY)
@@ -62,6 +64,7 @@ void Tile::updateTile()
 
 	float newY = lerp(y, yLerp, goalY);
 	y = newY;
+	//y = goalY;
 
 	// Update z
 	if (z != goalZ)
@@ -77,6 +80,7 @@ void Tile::updateTile()
 	float newZ = lerp(z, zLerp, goalZ);
 
 	z = newZ;
+	//z = goalZ;
 }
 
 
