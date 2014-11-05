@@ -32,6 +32,7 @@ GameMap::GameMap()
 	tileH = 5;
 	centerLayer = 0;
 	layerCount = 0;
+	layerSpacing = 40;
 
 	moveUp = false;
 	moveDown = false;
@@ -172,7 +173,6 @@ void GameMap::updateMap()
 	if (endLayer > layerCount) {endLayer = layerCount;}
 
 	float originalWidth = layers[centerLayer]->getX() + tileW * layers[centerLayer]->getColumnCount();
-	int sizeFactor = 40;
 
 	// Updating tilemap positions
 	for (int i=startLayer; i<endLayer; i++)
@@ -182,7 +182,7 @@ void GameMap::updateMap()
 		//layers[i]->setY(layers[i]->getY() + distFromCenter * (distFromCenter/2));
 		layers[i]->setY(y + distFromCenter * (distFromCenter/2));
 
-		distFromCenter /= sizeFactor;
+		distFromCenter /= layerSpacing;
 		float newWidth = x + (tileW*distFromCenter) * layers[centerLayer]->getColumnCount();
 		float newX = x - ((newWidth - originalWidth)/2);
 
@@ -289,6 +289,12 @@ SDL_Texture* GameMap::createTextureFromSurface (std::string path, SDL_Surface *c
 
 	return newTexture;
 } //END loadSurface()
+
+
+void GameMap::randomizeLayerSpacing()
+{
+	layerSpacing = randomNumber(abs(layerSpacing-10), layerSpacing+10);
+}
 
 
 // Untested!!!

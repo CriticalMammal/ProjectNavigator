@@ -16,6 +16,7 @@ class GameMap
 		bool saveMap(std::string fileLocation);
 		void updateMap();
 		void drawMap(SDL_Rect screenRect, SDL_Renderer* renderer);
+		void randomizeLayerSpacing();
 
 		bool moveUp, moveDown, moveLeft, moveRight;
 
@@ -44,6 +45,7 @@ class GameMap
 		int centerLayer;
 		int layerCount;
 		int maxLayersDisplayed;
+		int layerSpacing;
 };
 
 #endif

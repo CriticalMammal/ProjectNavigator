@@ -56,7 +56,7 @@ int Game::run()
 		cout << "Unable to load a sound. Mixer_ERROR: " << Mix_GetError() << endl;
 	}
 	Mix_VolumeChunk(pageFlip, 20);
-	channel = Mix_PlayChannel(-1, bgMusic, -1);
+	//channel = Mix_PlayChannel(-1, bgMusic, -1);
 
 	// MAIN LOOP
 	while (quit == false)
@@ -162,6 +162,10 @@ void Game::handleKey(SDL_Event event)
 					break;
 				case SDLK_s:
 					smoothScroll = !smoothScroll;
+					break;
+				case SDLK_1:
+					theMap.randomizeLayerSpacing();
+					break;
 			}
 			break;
 		case SDL_KEYUP:
