@@ -86,6 +86,7 @@
     <ClCompile Include="game.cpp" />
     <ClCompile Include="gameMap.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="player.cpp" />
     <ClCompile Include="tile.cpp" />
     <ClCompile Include="tileMap.cpp" />
     <ClCompile Include="timer.cpp" />
@@ -94,6 +95,7 @@
     <ClInclude Include="eventHandler.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="gameMap.h" />
+    <ClInclude Include="player.h" />
     <ClInclude Include="tile.h" />
     <ClInclude Include="tileMap.h" />
     <ClInclude Include="timer.h" />
