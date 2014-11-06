@@ -41,6 +41,8 @@ int Game::run()
 	float prevTime = 0;
 	EventHandler eventHandler(*this);
 	theMap.generateNewMap(1000, 3, 30, 50, 50, renderer);
+	theMap.setX(0);
+	theMap.setY(0);
 
 	// Load Audio
 	pageFlip = NULL;
@@ -165,6 +167,12 @@ void Game::handleKey(SDL_Event event)
 					break;
 				case SDLK_1:
 					theMap.randomizeLayerSpacing();
+					break;
+				case SDLK_2:
+					theMap.setLayerSpacing(theMap.getLayerSpacing() - theMap.getLayerSpacing()/2);
+					break;
+				case SDLK_3:
+					theMap.setLayerSpacing(theMap.getLayerSpacing() + 2*theMap.getLayerSpacing());
 					break;
 			}
 			break;

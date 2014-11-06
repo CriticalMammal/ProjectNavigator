@@ -26,10 +26,12 @@ class GameMap
 		double getTileH() {return tileH;}
 		int getCenterLayer() {return centerLayer;}
 		int getLayerCount() {return layerCount;}
+		int getLayerSpacing() {return layerSpacing;}
 
 		void setX(double newX) {x = newX;}
 		void setY(double newY) {y = newY;}
 		void setCenterLayer(int newLayer) {centerLayer = newLayer;}
+		void setLayerSpacing(int newSpace) {layerSpacing = newSpace;}
 		
 	private:
 		std::vector<SDL_Texture*> loadTileSheet(const char*, SDL_Renderer*);

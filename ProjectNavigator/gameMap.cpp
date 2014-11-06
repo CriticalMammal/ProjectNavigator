@@ -43,6 +43,7 @@ GameMap::GameMap()
 
 GameMap::~GameMap()
 {
+	// Delete pointers
 
 }
 

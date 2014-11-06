@@ -33,7 +33,7 @@ class Tile
 		float getHeight() {return height;}
 		bool getEmpty() {return empty;}
 
-	private:
+	protected:
 		TileType type;
 		bool collision;
 		SDL_Texture* tileTexture;
