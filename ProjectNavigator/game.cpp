@@ -41,8 +41,8 @@ int Game::run()
 	float prevTime = 0;
 	EventHandler eventHandler(*this);
 	theMap.generateNewMap(1000, 3, 30, 50, 50, renderer);
-	theMap.setX(0);
-	theMap.setY(0);
+	theMap.setX(-1250);
+	theMap.setY(160);
 
 	// Load Audio
 	pageFlip = NULL;
