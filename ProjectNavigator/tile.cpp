@@ -44,7 +44,7 @@ void Tile::updateTile()
 
 	if (xLerp < 1.0)
 	{
-		xLerp += 0.05;
+		xLerp += 0.1;
 	}
 
 	float newX = lerp(x, xLerp, goalX);
@@ -59,12 +59,11 @@ void Tile::updateTile()
 
 	if (yLerp < 1.0)
 	{
-		yLerp += 0.05;
+		yLerp += 0.1;
 	}
 
 	float newY = lerp(y, yLerp, goalY);
 	y = newY;
-	//y = goalY;
 
 	// Update z
 	if (z != goalZ)
@@ -74,12 +73,30 @@ void Tile::updateTile()
 
 	if (zLerp < 1.0)
 	{
-		zLerp += 0.05;
+		zLerp += 0.1;
 	}
 
 	float newZ = lerp(z, zLerp, goalZ);
 
 	z = newZ;
+
+	additionalAnimation();
+}
+
+
+void Tile::draw(SDL_Renderer* renderer)
+{
+	// Don't draw empty tiles
+	if (empty == false)
+	{
+		SDL_RenderCopy(renderer, tileTexture, NULL, &getRect());
+	}
+}
+
+
+void Tile::additionalAnimation()
+{
+	// No additional animation for basic tiles
 }
 
 

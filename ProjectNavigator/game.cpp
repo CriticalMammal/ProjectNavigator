@@ -43,6 +43,7 @@ int Game::run()
 	theMap.generateNewMap(1000, 3, 30, 50, 50, renderer);
 	theMap.setX(-1250);
 	theMap.setY(100);
+	theMap.setZ(1);
 
 	// Load Audio
 	pageFlip = NULL;

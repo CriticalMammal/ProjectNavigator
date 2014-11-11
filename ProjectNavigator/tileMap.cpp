@@ -139,10 +139,7 @@ void TileMap::drawTileMap(SDL_Rect screenRect, SDL_Renderer *renderer)
 	{
 		for (int c=0; c<columns; c++)
 		{
-			if (tiles[r][c]->getEmpty() == false) // Don't draw empty tiles
-			{
-				SDL_RenderCopy(renderer, tiles[r][c]->gettileTexture(), NULL, &tiles[r][c]->getRect());
-			}
+			tiles[r][c]->draw(renderer);
 		}
 	}
 } // END draw()

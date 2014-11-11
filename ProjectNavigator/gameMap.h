@@ -28,16 +28,18 @@ class GameMap
 			int layer, row, column;
 		};
 
-		double getX() {return x;}
-		double getY() {return y;}
-		double getTileW() {return tileW;}
-		double getTileH() {return tileH;}
+		float getX() {return x;}
+		float getY() {return y;}
+		float getZ() {return z;}
+		float getTileW() {return tileW;}
+		float getTileH() {return tileH;}
 		int getCenterLayer() {return centerLayer;}
 		int getLayerCount() {return layerCount;}
 		int getLayerSpacing() {return layerSpacing;}
 
-		void setX(double newX) {x = newX;}
-		void setY(double newY) {y = newY;}
+		void setX(float newX) {x = newX;}
+		void setY(float newY) {y = newY;}
+		void setZ(float newZ) {z = newZ;}
 		void setCenterLayer(int newLayer) {centerLayer = newLayer;}
 		void setLayerSpacing(int newSpace) {layerSpacing = newSpace;}
 		
@@ -50,9 +52,9 @@ class GameMap
 		std::vector<TileMap*> layers;
 		std::string mapFileName;
 		std::vector<SDL_Texture*> tileTextures;
-		double xOffset, yOffset;
-		double x, y;
-		double tileW, tileH;
+		float xOffset, yOffset;
+		float x, y, z;
+		float tileW, tileH;
 		int centerLayer;
 		int layerCount;
 		int maxLayersDisplayed;

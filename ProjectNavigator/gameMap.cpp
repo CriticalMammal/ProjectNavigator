@@ -31,6 +31,7 @@ GameMap::GameMap()
 	yOffset = 0;
 	x = 0; 
 	y = 0;
+	z = 1;
 	tileW = 5;
 	tileH = 5;
 	centerLayer = 0;
@@ -59,7 +60,7 @@ bool GameMap::generateNewMap(int layerCountIn, int layerRowAmt, int layerColumnA
 	tileH = tileHeight;
 	layerCount = layerCountIn;
 	centerLayer = layerCount/2;
-	maxLayersDisplayed = 100;
+	maxLayersDisplayed = 80;
 
 	{
 		playerCloseness = 20;
@@ -179,7 +180,7 @@ void GameMap::updateMap()
 		float newX = x - ((newWidth - originalWidth)/2);
 
 		layers[i]->setX(newX);
-		layers[i]->setZ(1+distFromCenter);
+		layers[i]->setZ(z+distFromCenter);
 
 		layers[i]->updateTiles();
 	}
@@ -230,8 +231,10 @@ void GameMap::movePlayerLeft()
 		playerLocation.column -= 1;
 		layers[playerLocation.layer]->replaceTile(playerLocation.tile, playerLocation.row, playerLocation.column);
 	}
-
-	x = xOffset - playerLocation.column*(tileW + (tileW*0.525));
+	
+	int layerFromMid = playerLocation.layer - centerLayer;
+	float sizeChange = (float) layerFromMid / (maxLayersDisplayed/2);
+	x = xOffset - playerLocation.column*(tileW + (tileW*sizeChange));
 }
 
 
@@ -244,7 +247,9 @@ void GameMap::movePlayerRight()
 		layers[playerLocation.layer]->replaceTile(playerLocation.tile, playerLocation.row, playerLocation.column);
 	}
 		
-	x = xOffset - playerLocation.column*(tileW + (tileW*0.525));
+	int layerFromMid = playerLocation.layer - centerLayer;
+	float sizeChange = (float) layerFromMid / (maxLayersDisplayed/2);
+	x = xOffset - playerLocation.column*(tileW + (tileW*sizeChange));
 }
 
 
