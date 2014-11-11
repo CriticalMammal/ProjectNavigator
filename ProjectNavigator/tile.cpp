@@ -12,7 +12,7 @@ Tile::Tile()
 	type = None;
 	tileTexture = NULL;
 
-	x = -1000;
+	x = 0;
 	y = 1000;
 	z = 1;
 	goalX = x;
@@ -80,7 +80,6 @@ void Tile::updateTile()
 	float newZ = lerp(z, zLerp, goalZ);
 
 	z = newZ;
-	//z = goalZ;
 }
 
 

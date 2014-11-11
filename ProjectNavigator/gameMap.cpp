@@ -17,6 +17,7 @@
 #include <functional>
 
 #include "tile.h"
+#include "playerTile.h"
 #include "tileMap.h"
 #include "gameMap.h"
 
@@ -26,6 +27,8 @@ using namespace std;
 GameMap::GameMap()
 {
 	mapFileName = "null";
+	xOffset = 0;
+	yOffset = 0;
 	x = 0; 
 	y = 0;
 	tileW = 5;
@@ -33,11 +36,7 @@ GameMap::GameMap()
 	centerLayer = 0;
 	layerCount = 0;
 	layerSpacing = 40;
-
-	moveUp = false;
-	moveDown = false;
-	moveLeft = false;
-	moveRight = false;
+	playerCloseness = 20;
 }
 
 
@@ -52,8 +51,8 @@ bool GameMap::generateNewMap(int layerCountIn, int layerRowAmt, int layerColumnA
 			double tileWidth, double tileHeight, SDL_Renderer* renderer)
 {
 	tileTextures = loadTileSheet("tileSheet.png", renderer); //test for errors
-	x = -1700;
-	y = 200;
+	xOffset = -100;
+	yOffset = 200;
 	float tempX = x;
 	float tempY = y;
 	tileW = tileWidth;
@@ -62,6 +61,19 @@ bool GameMap::generateNewMap(int layerCountIn, int layerRowAmt, int layerColumnA
 	centerLayer = layerCount/2;
 	maxLayersDisplayed = 100;
 
+	{
+		playerCloseness = 20;
+		Player* playerTile = new Player();
+		playerTile->setTileTexture(tileTextures[6]);
+		playerTile->setWidth(tileW);
+		playerTile->setHeight(tileH);
+
+		playerLocation.tile = playerTile;
+		playerLocation.layer = centerLayer + playerCloseness;
+		playerLocation.row = 1; //on top of ground level
+		playerLocation.column = layerColumnAmt/2; // middle column
+	}
+
 	for (int i=0; i<layerCount; i++)
 	{
 		// Add a new layer
@@ -69,6 +81,12 @@ bool GameMap::generateNewMap(int layerCountIn, int layerRowAmt, int layerColumnA
 		newLayer->generateMap(layerRowAmt, layerColumnAmt, tileWidth, tileHeight, tileTextures);
 		newLayer->setX(x);
 		newLayer->setY(y);
+
+		if (i == centerLayer + playerCloseness) // Add player tile
+		{
+			newLayer->replaceTile(playerLocation.tile, playerLocation.row, playerLocation.column);
+		}
+
 		layers.push_back(newLayer);
 
 		//move to next row
@@ -139,35 +157,8 @@ bool GameMap::saveMap(std::string fileLocation)
 
 void GameMap::updateMap()
 {
-	// Movement position changes
-	if (moveUp)
-	{
-		if (centerLayer > 0)
-		{
-			centerLayer --;
-		}
-	}
-	else if (moveDown)
-	{
-		if (centerLayer < layerCount-1)
-		{
-			centerLayer ++;
-		}
-	}
-
-	if (moveLeft)
-	{
-		x += tileW + (tileW*0.525);
-	}
-	else if (moveRight)
-	{
-		x -= tileW + (tileW*0.525);
-	}
-
-	//cout << centerLayer << endl;
 	layers[centerLayer]->setX(x);
 	
-
 	int startLayer = centerLayer-(maxLayersDisplayed/2);
 	if (startLayer < 0) {startLayer = 0;}
 	int endLayer = startLayer + maxLayersDisplayed;
@@ -193,6 +184,68 @@ void GameMap::updateMap()
 		layers[i]->updateTiles();
 	}
 } // END updateMap()
+
+
+void GameMap::movePlayerUp()
+{
+	if (playerLocation.layer-1 > 0)
+	{
+		layers[playerLocation.layer]->setTileEmpty(playerLocation.row, playerLocation.column);
+		playerLocation.layer -= 1;
+		layers[playerLocation.layer]->replaceTile(playerLocation.tile ,playerLocation.row, playerLocation.column);
+	}
+
+	centerLayer = playerLocation.layer-playerCloseness;
+
+	if (centerLayer <= 0)
+	{
+		centerLayer = 0;
+	}
+}
+
+
+void GameMap::movePlayerDown()
+{
+	if (playerLocation.layer+1 < layers.size())
+	{
+		layers[playerLocation.layer]->setTileEmpty(playerLocation.row, playerLocation.column);
+		playerLocation.layer += 1;
+		layers[playerLocation.layer]->replaceTile(playerLocation.tile ,playerLocation.row, playerLocation.column);
+	}
+
+	centerLayer = playerLocation.layer-playerCloseness;
+
+	if (centerLayer >= layers.size())
+	{
+		centerLayer = layers.size()-1;
+	}
+}
+
+
+void GameMap::movePlayerLeft()
+{
+	if (playerLocation.column-1 >= 0)
+	{
+		layers[playerLocation.layer]->setTileEmpty(playerLocation.row, playerLocation.column);
+		playerLocation.column -= 1;
+		layers[playerLocation.layer]->replaceTile(playerLocation.tile, playerLocation.row, playerLocation.column);
+	}
+
+	x = xOffset - playerLocation.column*(tileW + (tileW*0.525));
+}
+
+
+void GameMap::movePlayerRight()
+{
+	if (playerLocation.column+1 < layers[playerLocation.layer]->getColumnCount())
+	{
+		layers[playerLocation.layer]->setTileEmpty(playerLocation.row, playerLocation.column);
+		playerLocation.column += 1;
+		layers[playerLocation.layer]->replaceTile(playerLocation.tile, playerLocation.row, playerLocation.column);
+	}
+		
+	x = xOffset - playerLocation.column*(tileW + (tileW*0.525));
+}
 
 
 void GameMap::drawMap(SDL_Rect screenRect, SDL_Renderer* renderer)

@@ -17,8 +17,16 @@ class GameMap
 		void updateMap();
 		void drawMap(SDL_Rect screenRect, SDL_Renderer* renderer);
 		void randomizeLayerSpacing();
+		void movePlayerRight();
+		void movePlayerLeft();
+		void movePlayerUp();
+		void movePlayerDown();
 
-		bool moveUp, moveDown, moveLeft, moveRight;
+		struct tileLocation
+		{
+			Tile* tile;
+			int layer, row, column;
+		};
 
 		double getX() {return x;}
 		double getY() {return y;}
@@ -42,12 +50,16 @@ class GameMap
 		std::vector<TileMap*> layers;
 		std::string mapFileName;
 		std::vector<SDL_Texture*> tileTextures;
+		double xOffset, yOffset;
 		double x, y;
 		double tileW, tileH;
 		int centerLayer;
 		int layerCount;
 		int maxLayersDisplayed;
 		int layerSpacing;
+		int playerCloseness;
+
+		tileLocation playerLocation;
 };
 
 #endif

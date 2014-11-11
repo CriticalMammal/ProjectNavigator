@@ -51,26 +51,26 @@ bool TileMap::generateMap(int rowAmt, int columnAmt, double tileWidth, double ti
 			newRow.push_back(new Tile);
 		}
 		tiles.push_back(newRow);
+
 		// Set tile in each column
 		for (int c=0; c<columns; c++)
 		{
-			// Hard to read if statement that basically creates towering block structures
-			if (r == rows-1 || (int) randomNumber(1, 200) == 1 || r!= 0 && tiles[r-1][c]->getEmpty() == false)
+			float tileX = tempX + c*tileW;
+			tiles[r][c]->setX(tileX);
+			tiles[r][c]->setY(tempY);
+			tiles[r][c]->setZ(1);
+			tiles[r][c]->setWidth(tileW);
+			tiles[r][c]->setHeight(tileH);
+
+			// Create ground level tiles
+			if (r == 0)
 			{
-				float tileX = tempX + c*tileW;
-				tiles[r][c]->setX(tileX);
-				tiles[r][c]->setY(tempY);
-				tiles[r][c]->setZ(1);
-				tiles[r][c]->setWidth(tileW);
-				tiles[r][c]->setHeight(tileH);
-				if (r == rows-1)
-				{
-					tiles[r][c]->setTileTexture(tileTextures[randomNumber(0, 8)]);
-				}
-				else // It's cactus time
-				{
-					tiles[r][c]->setTileTexture(tileTextures[randomNumber(9, 12)]);
-				}
+				tiles[r][c]->setTileTexture(tileTextures[randomNumber(0, 8)]);
+			}
+			// Cactus time
+			else if (randomNumber(0, 100) < 1 && tiles[r-1][c]->getEmpty() == false)
+			{
+				tiles[r][c]->setTileTexture(tileTextures[randomNumber(9, 12)]);
 			}
 			else
 			{
@@ -100,7 +100,7 @@ void TileMap::updateTiles()
 
 	// Update tiles in reverse, so that they stack as expected
 	// (not ideal, I'd prefer changing this later)
-	for (int r = rows-1; r>=0; r--)
+	for (int r=0; r < rows; r++)
 	{
 		// Set tile in each column
 		for (int c=0; c<columns; c++)
@@ -117,6 +117,19 @@ void TileMap::updateTiles()
 		tempY -= tileH*z;
 	}
 } // END updateTiles()
+
+
+void TileMap::replaceTile(Tile* newTile, int row, int column)
+{
+	tiles[row][column] = newTile;
+}
+
+
+void TileMap::setTileEmpty(int row, int column)
+{
+	tiles[row][column] = new Tile();
+	tiles[row][column]->setEmpty(true);
+}
 
 
 void TileMap::drawTileMap(SDL_Rect screenRect, SDL_Renderer *renderer)
