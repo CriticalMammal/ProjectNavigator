@@ -13,6 +13,8 @@ class TileMap
 		void saveMapFile();
 		bool loadMap(std::vector<std::string>);
 		bool generateMap(int rowAmt, int columnAmt, double tileWidth, double tileHeight, std::vector<SDL_Texture*>);
+		void replaceTile(Tile* newTile, int tileRow, int tileColumn);
+		void setTileEmpty(int tileRow, int tileColumn);
 
 		double getX() {return x;}
 		double getY() {return y;}

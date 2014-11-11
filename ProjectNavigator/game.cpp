@@ -41,8 +41,9 @@ int Game::run()
 	float prevTime = 0;
 	EventHandler eventHandler(*this);
 	theMap.generateNewMap(1000, 3, 30, 50, 50, renderer);
-	theMap.setX(0);
-	theMap.setY(0);
+	theMap.setX(-1250);
+	theMap.setY(100);
+	theMap.setZ(1);
 
 	// Load Audio
 	pageFlip = NULL;
@@ -73,20 +74,12 @@ int Game::run()
 		// Handle game logic
 		SDL_Rect screenRect = {0, 0, screenWidth, screenHeight};
 		theMap.updateMap();
-		if (theMap.moveDown || theMap.moveUp)
-		{
-			//channel = Mix_PlayChannel(-1, pageFlip, 0);
-		}
-		SDL_Rect playerRect = {330, 350, 20, 20};
 
 		// Render
 		SDL_SetRenderDrawColor(renderer, 88, 232, 206, 0);
 		SDL_RenderClear(renderer);
 
 		theMap.drawMap(screenRect, renderer);
-
-		SDL_SetRenderDrawColor(renderer, 20, 50, 50, 255);
-		SDL_RenderFillRect(renderer, &playerRect);
 
 		SDL_RenderPresent(renderer);
 	}
@@ -117,50 +110,16 @@ void Game::handleKey(SDL_Event event)
 					quit = true;
 					break;
 				case SDLK_UP:
-					if (smoothScroll)
-					{
-						theMap.moveUp = true;
-					}
-					else
-					{
-						if (theMap.getCenterLayer() > 0)
-						{
-							theMap.setCenterLayer(theMap.getCenterLayer()-1);
-						}	
-					}
+					theMap.movePlayerUp();
 					break;
 				case SDLK_DOWN:
-					if (smoothScroll)
-					{
-						theMap.moveDown = true;
-					}
-					else
-					{
-						if (theMap.getCenterLayer() < theMap.getLayerCount()-1)
-						{
-							theMap.setCenterLayer(theMap.getCenterLayer()+1);
-						}
-					}
+					theMap.movePlayerDown();
 					break;
 				case SDLK_RIGHT:
-					if (smoothScroll)
-					{
-						theMap.moveRight = true;
-					}
-					else
-					{
-						theMap.setX(theMap.getX() - 76.25);
-					}
+					theMap.movePlayerRight();
 					break;
 				case SDLK_LEFT:
-					if (smoothScroll)
-					{
-						theMap.moveLeft = true;
-					}
-					else
-					{
-						theMap.setX(theMap.getX() + 76.25);
-					}
+					theMap.movePlayerLeft();
 					break;
 				case SDLK_s:
 					smoothScroll = !smoothScroll;
@@ -180,16 +139,7 @@ void Game::handleKey(SDL_Event event)
 			switch(event.key.keysym.sym)
 			{
 				case SDLK_UP:
-					theMap.moveUp = false;
-					break;
-				case SDLK_DOWN:
-					theMap.moveDown = false;
-					break;
-				case SDLK_RIGHT:
-					theMap.moveRight = false;
-					break;
-				case SDLK_LEFT:
-					theMap.moveLeft = false;
+					// Do something
 					break;
 			}
 			break;

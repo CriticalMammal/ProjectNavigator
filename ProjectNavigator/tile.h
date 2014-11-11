@@ -10,6 +10,7 @@ class Tile
 		enum TileType {None, Grass};
 		void updateTile();
 		SDL_Rect getRect();
+		virtual void draw(SDL_Renderer* renderer);
 
 		//set functions
 		void setCollision(bool boolIn) {collision = boolIn;}
@@ -43,6 +44,7 @@ class Tile
 		float width, height;
 		bool empty;
 
+		virtual void additionalAnimation();
 		float lerp(float, float, float);
 };
 
