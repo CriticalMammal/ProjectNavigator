@@ -65,12 +65,30 @@ bool TileMap::generateMap(int rowAmt, int columnAmt, double tileWidth, double ti
 			// Create ground level tiles
 			if (r == 0)
 			{
-				tiles[r][c]->setTileTexture(tileTextures[randomNumber(0, 8)]);
+				int randTexture = randomNumber(0, 8);
+				tiles[r][c]->setTileTexture(tileTextures[randTexture]);
+				switch (randTexture)
+				{
+					case 0:
+					case 1:
+					case 2:
+						tiles[r][c]->setType(tiles[r][c]->dirt);
+						break;
+					case 3:
+					case 4:
+					case 5:
+						tiles[r][c]->setType(tiles[r][c]->grey);
+					case 6:
+					case 7:
+					case 8:
+						tiles[r][c]->setType(tiles[r][c]->orange);
+				}
 			}
 			// Cactus time
 			else if (randomNumber(0, 100) < 1 && tiles[r-1][c]->getEmpty() == false)
 			{
 				tiles[r][c]->setTileTexture(tileTextures[randomNumber(9, 12)]);
+				tiles[r][c]->setType(tiles[r][c]->cactus);
 			}
 			else
 			{
@@ -91,6 +109,22 @@ bool TileMap::loadMap(vector<string> mapDataStr)
 {
 	return false;
 } // END loadMap
+
+
+void TileMap::saveMapFile(std::ofstream& externMapFile)
+{
+	//externMapFile.open("mapFile.txt");
+
+	for (int r=0; r<rows; r++)
+	{
+		for (int c=0; c<columns; c++)
+		{
+			externMapFile << tiles[r][c]->getType() << ",";
+		}
+
+		externMapFile << endl;
+	}
+}
 
 
 void TileMap::updateTiles()
@@ -143,24 +177,6 @@ void TileMap::drawTileMap(SDL_Rect screenRect, SDL_Renderer *renderer)
 		}
 	}
 } // END draw()
-
-
-void TileMap::saveMapFile()
-{
-	ofstream externMapFile;
-	externMapFile.open("mapFile.txt");
-
-	/*
-	for (int i=0; i<tileMap.size(); i++)
-	{
-		//produces a non-human readable mess... add in a way to read 
-		//tileMap[i]+' '; later so that the output file is readable by a person
-		externMapFile << tileMap[i] << ' ';
-	}
-	*/
-
-	externMapFile.close();
-}
 
 
 // Untested!!!

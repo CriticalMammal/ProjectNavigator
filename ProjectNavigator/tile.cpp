@@ -9,7 +9,7 @@ Tile::Tile()
 {
 	collision = false;
 	empty = false;
-	type = None;
+	type = none;
 	tileTexture = NULL;
 
 	x = 0;

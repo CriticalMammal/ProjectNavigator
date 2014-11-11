@@ -10,7 +10,7 @@ class TileMap
 		void updateTiles();
 		void drawTileMap(SDL_Rect, SDL_Renderer* renderer);
 
-		void saveMapFile();
+		void saveMapFile(std::ofstream&);
 		bool loadMap(std::vector<std::string>);
 		bool generateMap(int rowAmt, int columnAmt, double tileWidth, double tileHeight, std::vector<SDL_Texture*>);
 		void replaceTile(Tile* newTile, int tileRow, int tileColumn);

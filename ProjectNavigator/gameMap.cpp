@@ -68,6 +68,7 @@ bool GameMap::generateNewMap(int layerCountIn, int layerRowAmt, int layerColumnA
 		playerTile->setTileTexture(tileTextures[6]);
 		playerTile->setWidth(tileW);
 		playerTile->setHeight(tileH);
+		playerTile->setType(playerTile->player);
 
 		playerLocation.tile = playerTile;
 		playerLocation.layer = centerLayer + playerCloseness;
@@ -113,25 +114,18 @@ bool GameMap::loadMap(std::string filePath, SDL_Renderer* renderer)
 		std::vector<int> tileIntLine;
 
 		// Read a line of the file
-		while (mapFile)
+		while (mapFile.good())
 		{
 			string recordLine;
-			
-			if (!getline( mapFile, recordLine))
-			{
-				break;
-			}
+			getline(mapFile, recordLine);
 
 			// Break up line into parts
 			istringstream strStream(recordLine);
 
-			while(strStream)
+			while(strStream.good())
 			{
 				string recordPart;
-				if (!getline(strStream, recordPart, ','))
-				{
-					break;
-				}
+				getline(strStream, recordPart, ',');
 				
 				// Create a convertStringToInt function
 				int partValue = convertStringToInt(recordPart);
@@ -152,7 +146,18 @@ bool GameMap::loadMap(std::string filePath, SDL_Renderer* renderer)
 
 bool GameMap::saveMap(std::string fileLocation)
 {
-	return false;
+	ofstream externMapFile;
+	externMapFile.open("mapFile.txt");
+
+	for (int i=0; i<layers.size(); i++)
+	{
+		externMapFile << "layer" << i << endl;
+		layers[i]->saveMapFile(externMapFile);
+	}
+
+	externMapFile.close();
+
+	return true;
 }
 
 

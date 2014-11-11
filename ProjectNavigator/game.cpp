@@ -84,6 +84,7 @@ int Game::run()
 		SDL_RenderPresent(renderer);
 	}
 
+	theMap.saveMap("mapFile.csv");
 	Mix_FadeOutChannel(channel, 2000);
 	while (Mix_FadingChannel(channel))
 	{
