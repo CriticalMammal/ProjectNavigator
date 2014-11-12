@@ -54,8 +54,6 @@ bool GameMap::generateNewMap(int layerCountIn, int layerRowAmt, int layerColumnA
 	tileTextures = loadTileSheet("tileSheet.png", renderer); //test for errors
 	xOffset = -100;
 	yOffset = 200;
-	float tempX = x;
-	float tempY = y;
 	tileW = tileWidth;
 	tileH = tileHeight;
 	layerCount = layerCountIn;
@@ -90,10 +88,6 @@ bool GameMap::generateNewMap(int layerCountIn, int layerRowAmt, int layerColumnA
 		}
 
 		layers.push_back(newLayer);
-
-		//move to next row
-		tempX = x;
-		tempY += tileH;
 	}
 
 	return true;
@@ -103,34 +97,84 @@ bool GameMap::generateNewMap(int layerCountIn, int layerRowAmt, int layerColumnA
 bool GameMap::loadMap(std::string filePath, SDL_Renderer* renderer)
 {
 	tileTextures = loadTileSheet("tileSheet.png", renderer);
+	xOffset = -100;
+	yOffset = 200;
 
 	ifstream mapFile(filePath);
 	
 	if (mapFile.is_open())
 	{
-		// You'll need to seperate most of this into something like
-		// the CabRecordReaper, to simplify this section and allow
-		// you to read each line and create tiles from them.
-		std::vector<int> tileIntLine;
+		// First get game map's dimensions
+		int layerRowCount = 0;
+		int layerColumnCount = 0;
 
-		// Read a line of the file
-		while (mapFile.good())
+		if (mapFile.good())
 		{
-			string recordLine;
-			getline(mapFile, recordLine);
+			string mapData;
+			getline(mapFile, mapData, ',');
+			layerCount = convertStringToInt(mapData);
 
-			// Break up line into parts
-			istringstream strStream(recordLine);
+			getline(mapFile, mapData, ',');
+			layerRowCount = convertStringToInt(mapData);
 
-			while(strStream.good())
+			getline(mapFile, mapData, ',');
+			layerColumnCount = convertStringToInt(mapData);
+
+			getline(mapFile, mapData, ',');
+			tileW = convertStringToInt(mapData);
+
+			getline(mapFile, mapData, ',');
+			tileH = convertStringToInt(mapData);
+
+			getline(mapFile, mapData); // there was an empty line of data for some reason
+		}
+
+		// Init other variables
+		centerLayer = layerCount/2;
+		maxLayersDisplayed = 80;
+		playerCloseness = 20;
+		
+		// Initialize each game map layer
+		for (int i=0; i<layerCount; i++)
+		{
+			// Two dimensional vector to store map data
+			std::vector< std::vector<int> > layerMapData;
+
+			for (int r=0; r<layerRowCount; r++)
 			{
-				string recordPart;
-				getline(strStream, recordPart, ',');
-				
-				// Create a convertStringToInt function
-				int partValue = convertStringToInt(recordPart);
-				tileIntLine.push_back(partValue);
+				vector<int> temp;
+				layerMapData.push_back(temp);
+
+				// Read a line of the file
+				if (mapFile.good())
+				{
+					string recordLine;
+					getline(mapFile, recordLine);
+
+					// Break up line into parts
+					istringstream strStream(recordLine);
+					while(strStream.good())
+					{
+						string recordPart;
+						getline(strStream, recordPart, ',');
+						
+						// Add valid number to vector
+						if (recordPart[0] != '*' && recordPart.empty() == false)
+						{
+							int partValue = convertStringToInt(recordPart);
+							layerMapData[r].push_back(partValue);
+						}
+					}
+				}
 			}
+
+			// Create map layer from data just read
+			TileMap* newLayer = new TileMap();
+			newLayer->loadMap(layerMapData, tileH, tileW, tileTextures);
+			newLayer->setX(x);
+			newLayer->setY(y);
+
+			layers.push_back(newLayer);
 		}
 
 		mapFile.close();
@@ -149,9 +193,15 @@ bool GameMap::saveMap(std::string fileLocation)
 	ofstream externMapFile;
 	externMapFile.open("mapFile.txt");
 
+	// Write some map information
+	// layerCount, layerRowCount, layerColumnCount, layerTileW, layerTileH
+	externMapFile << layers.size() << "," << layers[0]->getRowCount() << "," << 
+		layers[0]->getColumnCount() << "," << layers[0]->getTileW() << "," << 
+		layers[0]->getTileH() << "," << endl;
+
+	// Save Tile Types for each layer
 	for (int i=0; i<layers.size(); i++)
 	{
-		externMapFile << "layer" << i << endl;
 		layers[i]->saveMapFile(externMapFile);
 	}
 
@@ -163,6 +213,12 @@ bool GameMap::saveMap(std::string fileLocation)
 
 void GameMap::updateMap()
 {
+	if (playerLocation.column < -10000)
+	{
+		cout << "looking for player" << endl;
+		findPlayerTile();
+	}
+	
 	layers[centerLayer]->setX(x);
 	
 	int startLayer = centerLayer-(maxLayersDisplayed/2);
@@ -190,6 +246,27 @@ void GameMap::updateMap()
 		layers[i]->updateTiles();
 	}
 } // END updateMap()
+
+
+// Used if player tile location is unknown, doesn't do any error checks
+void GameMap::findPlayerTile()
+{
+	for (int i=0; i<layers.size(); i++)
+	{
+		TileMap::TileInfo playerInfo = layers[i]->findPlayerTile();
+		playerLocation.tile = playerInfo.tile;
+
+		if (playerLocation.tile != nullptr)
+		{
+			playerLocation.row = playerInfo.row;
+			playerLocation.column = playerInfo.column;
+			playerLocation.layer = i;
+			return;
+		}
+	}
+
+	return;
+}
 
 
 void GameMap::movePlayerUp()

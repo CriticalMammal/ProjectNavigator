@@ -17,6 +17,7 @@ class GameMap
 		void updateMap();
 		void drawMap(SDL_Rect screenRect, SDL_Renderer* renderer);
 		void randomizeLayerSpacing();
+		void findPlayerTile();
 		void movePlayerRight();
 		void movePlayerLeft();
 		void movePlayerUp();

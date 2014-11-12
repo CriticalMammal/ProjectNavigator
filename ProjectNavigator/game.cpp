@@ -40,8 +40,9 @@ int Game::run()
 	// Initialize variables
 	float prevTime = 0;
 	EventHandler eventHandler(*this);
-	theMap.generateNewMap(1000, 3, 30, 50, 50, renderer);
-	theMap.setX(-1250);
+	//theMap.generateNewMap(300, 3, 30, 50, 50, renderer);
+	theMap.loadMap("mapFile.txt", renderer);
+	//theMap.setX(-1250);
 	theMap.setY(100);
 	theMap.setZ(1);
 
@@ -84,7 +85,7 @@ int Game::run()
 		SDL_RenderPresent(renderer);
 	}
 
-	theMap.saveMap("mapFile.csv");
+	//theMap.saveMap("mapFile.csv");
 	Mix_FadeOutChannel(channel, 2000);
 	while (Mix_FadingChannel(channel))
 	{

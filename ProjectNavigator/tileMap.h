@@ -7,14 +7,21 @@ class TileMap
 		TileMap();
 		~TileMap();
 
+		struct TileInfo
+		{
+			Tile* tile;
+			int row, column;
+		};
+
 		void updateTiles();
 		void drawTileMap(SDL_Rect, SDL_Renderer* renderer);
 
 		void saveMapFile(std::ofstream&);
-		bool loadMap(std::vector<std::string>);
+		bool loadMap(std::vector< std::vector<int> > mapData, int tileHeight, int tileWidth, std::vector<SDL_Texture*>);
 		bool generateMap(int rowAmt, int columnAmt, double tileWidth, double tileHeight, std::vector<SDL_Texture*>);
 		void replaceTile(Tile* newTile, int tileRow, int tileColumn);
 		void setTileEmpty(int tileRow, int tileColumn);
+		TileInfo findPlayerTile();
 
 		double getX() {return x;}
 		double getY() {return y;}

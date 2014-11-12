@@ -12,6 +12,7 @@
 
 #include "tile.h"
 #include "tileMap.h"
+#include "playerTile.h"
 
 using namespace std;
 extern double zoom;
@@ -105,9 +106,72 @@ bool TileMap::generateMap(int rowAmt, int columnAmt, double tileWidth, double ti
 } // END generateMap
 
 
-bool TileMap::loadMap(vector<string> mapDataStr)
+bool TileMap::loadMap(std::vector< std::vector<int> > mapData, int tileHeight, int tileWidth, std::vector<SDL_Texture*> tileTextures)
 {
-	return false;
+	x = 0;
+	y = 0;
+	rows = mapData.size(); // WHY IS THERE AN EXTRA ROW????
+	columns = mapData[0].size();
+	tileH = tileHeight;
+	tileW = tileWidth;
+
+	float tempX = x;
+	float tempY = y;
+
+	for (int r=0; r<rows; r++)
+	{
+		// Add a new row of tiles
+		vector<Tile*> newRow;
+
+		// Set tile in each column
+		for (int c=0; c<columns; c++)
+		{
+			if ((Tile::TileType) mapData[r][c] == Tile::player)
+			{
+				newRow.push_back(new Player);
+			}
+			else
+			{
+				newRow.push_back(new Tile);
+			}
+
+			float tileX = tempX + c*tileW;
+			newRow[c]->setX(tileX);
+			newRow[c]->setY(tempY);
+			newRow[c]->setZ(1);
+			newRow[c]->setWidth(tileW);
+			newRow[c]->setHeight(tileH);
+			newRow[c]->setType((Tile::TileType) mapData[r][c]); // Cast mapData int to TileType enum
+
+			switch(newRow[c]->getType())
+			{
+				case Tile::none:
+					newRow[c]->setEmpty(true);
+					break;
+				case Tile::dirt:
+					newRow[c]->setTileTexture(tileTextures[0]);
+					break;
+				case Tile::grey:
+					newRow[c]->setTileTexture(tileTextures[3]);
+					break;
+				case Tile::orange:
+					newRow[c]->setTileTexture(tileTextures[6]);
+					break;
+				case Tile::cactus:
+					newRow[c]->setTileTexture(tileTextures[9]);
+					break;
+				case Tile::player:
+					newRow[c]->setTileTexture(tileTextures[3]);
+			}
+		}
+
+		//move to next row
+		tiles.push_back(newRow);
+		tempX = x;
+		tempY += tileH;
+	}
+
+	return true;
 } // END loadMap
 
 
@@ -119,7 +183,12 @@ void TileMap::saveMapFile(std::ofstream& externMapFile)
 	{
 		for (int c=0; c<columns; c++)
 		{
-			externMapFile << tiles[r][c]->getType() << ",";
+			externMapFile << tiles[r][c]->getType();
+			if (c != columns-1)
+			{
+				//externMapFile << ",";
+			}
+			externMapFile << ",";
 		}
 
 		externMapFile << endl;
@@ -163,6 +232,28 @@ void TileMap::setTileEmpty(int row, int column)
 {
 	tiles[row][column] = new Tile();
 	tiles[row][column]->setEmpty(true);
+}
+
+
+TileMap::TileInfo TileMap::findPlayerTile()
+{
+	TileInfo playerLoc = TileInfo();
+
+	for (int r=0; r<rows; r++)
+	{
+		for (int c=0; c<columns; c++)
+		{
+			if (tiles[r][c]->getType() == Tile::player)
+			{
+				playerLoc.tile = tiles[r][c];
+				playerLoc.row = r;
+				playerLoc.column = c;
+				return playerLoc;
+			}
+		}
+	}
+
+	return playerLoc;
 }
 
 
