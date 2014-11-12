@@ -82,21 +82,27 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="button.cpp" />
     <ClCompile Include="eventHandler.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="gameMap.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="playerTile.cpp" />
+    <ClCompile Include="sideMenu.cpp" />
     <ClCompile Include="tile.cpp" />
+    <ClCompile Include="tileEditorMenu.cpp" />
     <ClCompile Include="tileMap.cpp" />
     <ClCompile Include="timer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="button.h" />
     <ClInclude Include="eventHandler.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="gameMap.h" />
     <ClInclude Include="playerTile.h" />
+    <ClInclude Include="sideMenu.h" />
     <ClInclude Include="tile.h" />
+    <ClInclude Include="tileEditorMenu.h" />
     <ClInclude Include="tileMap.h" />
     <ClInclude Include="timer.h" />
   </ItemGroup>

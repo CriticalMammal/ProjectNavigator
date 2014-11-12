@@ -13,18 +13,24 @@
 #include "tile.h"
 #include "tileMap.h"
 #include "gameMap.h"
+#include "button.h"
+#include "sideMenu.h"
+#include "tileEditorMenu.h"
 #include "game.h"
 #include "eventHandler.h"
 
 using namespace std;
-
+int mouseX, mouseY;
+bool leftClick;
 
 Game::Game()
 {
 	screenWidth = 640;
 	screenHeight = 480;
 	quit = false;
-	smoothScroll = false;
+	mouseX = 0;
+	mouseY = 0;
+	leftClick = false;
 }
 
 
@@ -42,9 +48,11 @@ int Game::run()
 	EventHandler eventHandler(*this);
 	//theMap.generateNewMap(300, 3, 30, 50, 50, renderer);
 	theMap.loadMap("mapFile.txt", renderer);
-	//theMap.setX(-1250);
 	theMap.setY(100);
 	theMap.setZ(1);
+
+	tileEditorMenu;
+	tileEditorMenu.setTileImages(theMap.getTileTextures());
 
 	// Load Audio
 	pageFlip = NULL;
@@ -73,14 +81,19 @@ int Game::run()
 		eventHandler.handleEvents();
 
 		// Handle game logic
+		SDL_GetMouseState(&mouseX, &mouseY);
 		SDL_Rect screenRect = {0, 0, screenWidth, screenHeight};
 		theMap.updateMap();
+		tileEditorMenu.update();
+		tileEditorMenu.updateTileEditor();
 
 		// Render
 		SDL_SetRenderDrawColor(renderer, 88, 232, 206, 0);
 		SDL_RenderClear(renderer);
 
 		theMap.drawMap(screenRect, renderer);
+		tileEditorMenu.draw(renderer);
+		tileEditorMenu.drawButtons(renderer);
 
 		SDL_RenderPresent(renderer);
 	}
@@ -124,7 +137,10 @@ void Game::handleKey(SDL_Event event)
 					theMap.movePlayerLeft();
 					break;
 				case SDLK_s:
-					smoothScroll = !smoothScroll;
+					tileEditorMenu.setMenuOpen(!tileEditorMenu.getMenuOpen());
+					break;
+				case SDLK_c:
+					leftClick = true;
 					break;
 				case SDLK_1:
 					theMap.randomizeLayerSpacing();
@@ -142,6 +158,9 @@ void Game::handleKey(SDL_Event event)
 			{
 				case SDLK_UP:
 					// Do something
+					break;
+				case SDLK_c:
+					leftClick = false;
 					break;
 			}
 			break;

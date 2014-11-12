@@ -37,6 +37,7 @@ class GameMap
 		int getCenterLayer() {return centerLayer;}
 		int getLayerCount() {return layerCount;}
 		int getLayerSpacing() {return layerSpacing;}
+		std::vector<SDL_Texture*> getTileTextures() {return tileTextures;}
 
 		void setX(float newX) {x = newX;}
 		void setY(float newY) {y = newY;}

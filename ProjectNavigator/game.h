@@ -12,6 +12,9 @@
 #include "tile.h"
 #include "tileMap.h"
 #include "gameMap.h"
+#include "button.h"
+#include "sideMenu.h"
+#include "tileEditorMenu.h"
 
 class Game
 {
@@ -32,10 +35,10 @@ class Game
 		SDL_Window *window;
 		SDL_Renderer *renderer;
 		GameMap theMap;
+		TileEditorMenu tileEditorMenu;
 		int screenWidth;
 		int screenHeight;
 		bool quit;
-		bool smoothScroll;
 		Mix_Chunk *pageFlip;
 		Mix_Chunk *bgMusic;
 		int channel;
