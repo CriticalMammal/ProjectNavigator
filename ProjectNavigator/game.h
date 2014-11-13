@@ -39,6 +39,7 @@ class Game
 		int screenWidth;
 		int screenHeight;
 		bool quit;
+		bool editMode;
 		Mix_Chunk *pageFlip;
 		Mix_Chunk *bgMusic;
 		int channel;

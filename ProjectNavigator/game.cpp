@@ -31,6 +31,7 @@ Game::Game()
 	mouseX = 0;
 	mouseY = 0;
 	leftClick = false;
+	editMode = false;
 }
 
 
@@ -47,7 +48,7 @@ int Game::run()
 	float prevTime = 0;
 	EventHandler eventHandler(*this);
 	//theMap.generateNewMap(300, 3, 30, 50, 50, renderer);
-	theMap.loadMap("mapFile.txt", renderer);
+	theMap.loadMap("mapFile.csv", renderer);
 	theMap.setY(100);
 	theMap.setZ(1);
 
@@ -83,17 +84,29 @@ int Game::run()
 		// Handle game logic
 		SDL_GetMouseState(&mouseX, &mouseY);
 		SDL_Rect screenRect = {0, 0, screenWidth, screenHeight};
+		if (editMode == true)
+		{
+			tileEditorMenu.update();
+			tileEditorMenu.updateTileEditor();
+			int buttonClick = tileEditorMenu.handleButtonClick();
+			if (buttonClick != -1)
+			{
+				theMap.setFocusTile(buttonClick);
+			}
+		}
+		
 		theMap.updateMap();
-		tileEditorMenu.update();
-		tileEditorMenu.updateTileEditor();
 
 		// Render
 		SDL_SetRenderDrawColor(renderer, 88, 232, 206, 0);
 		SDL_RenderClear(renderer);
 
 		theMap.drawMap(screenRect, renderer);
-		tileEditorMenu.draw(renderer);
-		tileEditorMenu.drawButtons(renderer);
+		if (tileEditorMenu.getMenuOpen() == true)
+		{
+			tileEditorMenu.draw(renderer);
+			tileEditorMenu.drawButtons(renderer);
+		}
 
 		SDL_RenderPresent(renderer);
 	}
@@ -125,18 +138,31 @@ void Game::handleKey(SDL_Event event)
 					quit = true;
 					break;
 				case SDLK_UP:
-					theMap.movePlayerUp();
+				case SDLK_w:
+					theMap.moveFocusForward();
 					break;
 				case SDLK_DOWN:
-					theMap.movePlayerDown();
+				case SDLK_s:
+					theMap.moveFocusBackward();
 					break;
 				case SDLK_RIGHT:
-					theMap.movePlayerRight();
+				case SDLK_d:
+					theMap.moveFocusRight();
 					break;
 				case SDLK_LEFT:
-					theMap.movePlayerLeft();
+				case SDLK_a:
+					theMap.moveFocusLeft();
 					break;
-				case SDLK_s:
+				case SDLK_r:
+					theMap.moveFocusUp();
+					break;
+				case SDLK_f:
+					theMap.moveFocusDown();
+					break;
+				case SDLK_TAB:
+					editMode = !editMode;
+					theMap.setEditMode(editMode);
+					if (editMode == false) {theMap.findPlayerTile();} // Reset focus on player tile
 					tileEditorMenu.setMenuOpen(!tileEditorMenu.getMenuOpen());
 					break;
 				case SDLK_c:
@@ -162,6 +188,8 @@ void Game::handleKey(SDL_Event event)
 				case SDLK_c:
 					leftClick = false;
 					break;
+				case SDLK_F5:
+					theMap.saveMap("mapFile.csv");
 			}
 			break;
 	}

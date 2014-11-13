@@ -18,10 +18,13 @@ class GameMap
 		void drawMap(SDL_Rect screenRect, SDL_Renderer* renderer);
 		void randomizeLayerSpacing();
 		void findPlayerTile();
-		void movePlayerRight();
-		void movePlayerLeft();
-		void movePlayerUp();
-		void movePlayerDown();
+		void moveFocusRight();
+		void moveFocusLeft();
+		void moveFocusForward();
+		void moveFocusBackward();
+		void moveFocusUp();
+		void moveFocusDown();
+		void setFocusTile(int tileType);
 
 		struct tileLocation
 		{
@@ -38,12 +41,14 @@ class GameMap
 		int getLayerCount() {return layerCount;}
 		int getLayerSpacing() {return layerSpacing;}
 		std::vector<SDL_Texture*> getTileTextures() {return tileTextures;}
+		bool getEditMode() {return editMode;}
 
 		void setX(float newX) {x = newX;}
 		void setY(float newY) {y = newY;}
 		void setZ(float newZ) {z = newZ;}
 		void setCenterLayer(int newLayer) {centerLayer = newLayer;}
 		void setLayerSpacing(int newSpace) {layerSpacing = newSpace;}
+		void setEditMode(bool newBool) {editMode = newBool;}
 		
 	private:
 		std::vector<SDL_Texture*> loadTileSheet(const char*, SDL_Renderer*);
@@ -62,8 +67,9 @@ class GameMap
 		int maxLayersDisplayed;
 		int layerSpacing;
 		int playerCloseness;
+		bool editMode;
 
-		tileLocation playerLocation;
+		tileLocation focusLocation;
 };
 
 #endif

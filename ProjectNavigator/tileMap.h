@@ -21,6 +21,8 @@ class TileMap
 		bool generateMap(int rowAmt, int columnAmt, double tileWidth, double tileHeight, std::vector<SDL_Texture*>);
 		void replaceTile(Tile* newTile, int tileRow, int tileColumn);
 		void setTileEmpty(int tileRow, int tileColumn);
+		bool isTileEmpty(int tileRow, int tileColumn);
+		Tile* getTileAt(int tileRow, int tileColumn);
 		TileInfo findPlayerTile();
 
 		double getX() {return x;}

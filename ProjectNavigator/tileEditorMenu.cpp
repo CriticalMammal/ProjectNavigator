@@ -10,7 +10,9 @@ extern int mouseX, mouseY;
 
 TileEditorMenu::TileEditorMenu()
 {
+	menuOpen = false;
 	buttonImagesSet = false;
+	buttonClicked = false;
 	buttonAmt = 21;
 	int menuPadHeight = 15;
 	int menuPadWidth = 15;
@@ -87,6 +89,12 @@ void TileEditorMenu::updateTileEditor()
 		if (buttons[i].getButtonClicked())
 		{
 			clickedButtonType = i;
+			buttonClicked = true;
+			break;
+		}
+		else
+		{
+			buttonClicked = false;
 		}
 	}
 
@@ -106,6 +114,20 @@ void TileEditorMenu::updateTileEditor()
 	}
 
 } //END updateTileEditor()
+
+
+int TileEditorMenu::handleButtonClick()
+{
+	if (buttonClicked)
+	{
+		return clickedButtonType;
+		buttonClicked = false;
+	}
+	else
+	{
+		return -1;
+	}
+}
 
 
 void TileEditorMenu::drawButtons(SDL_Renderer* renderer)

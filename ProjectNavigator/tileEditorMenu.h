@@ -6,7 +6,7 @@
 class TileEditorMenu : public SideMenu
 {
 	private:
-		bool buttonImagesSet, menuMouseFocus;
+		bool buttonImagesSet, menuMouseFocus, buttonClicked;
 		int buttonAmt, clickedButtonType;
 		std::vector<Button> buttons;
 		std::vector<SDL_Texture*> tileImages;
@@ -20,6 +20,7 @@ class TileEditorMenu : public SideMenu
 
 		void updateTileEditor();
 		void drawButtons(SDL_Renderer*);
+		int handleButtonClick();
 
 		void setTileImages(std::vector<SDL_Texture*> images) {tileImages = images;}
 

@@ -7,8 +7,15 @@ class Tile
 		Tile();
 		~Tile();
 
-		enum TileType {none = 0, dirt = 1, orange = 2, grey = 3, cactus = 4,
-			player = 5};
+		enum TileType 
+		{
+			dirt0 = 0,    dirt1 = 1,    dirt2 = 2, 
+			orange0 = 3,  orange1 = 4,  orange2 = 5, 
+			grey0 = 6,    grey1 = 7,    grey2 = 8, 
+			cactus0 = 9,  cactus1 = 10, cactus2 = 11, 
+			none = 12, 
+			player = 13
+		};
 		void updateTile();
 		SDL_Rect getRect();
 		virtual void draw(SDL_Renderer* renderer);

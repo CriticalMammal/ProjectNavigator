@@ -68,28 +68,14 @@ bool TileMap::generateMap(int rowAmt, int columnAmt, double tileWidth, double ti
 			{
 				int randTexture = randomNumber(0, 8);
 				tiles[r][c]->setTileTexture(tileTextures[randTexture]);
-				switch (randTexture)
-				{
-					case 0:
-					case 1:
-					case 2:
-						tiles[r][c]->setType(tiles[r][c]->dirt);
-						break;
-					case 3:
-					case 4:
-					case 5:
-						tiles[r][c]->setType(tiles[r][c]->grey);
-					case 6:
-					case 7:
-					case 8:
-						tiles[r][c]->setType(tiles[r][c]->orange);
-				}
+				tiles[r][c]->setType((Tile::TileType) randTexture);
 			}
 			// Cactus time
 			else if (randomNumber(0, 100) < 1 && tiles[r-1][c]->getEmpty() == false)
 			{
-				tiles[r][c]->setTileTexture(tileTextures[randomNumber(9, 12)]);
-				tiles[r][c]->setType(tiles[r][c]->cactus);
+				int randTexture = randomNumber(9, 12);
+				tiles[r][c]->setTileTexture(tileTextures[randTexture]);
+				tiles[r][c]->setType((Tile::TileType) randTexture);
 			}
 			else
 			{
@@ -143,26 +129,43 @@ bool TileMap::loadMap(std::vector< std::vector<int> > mapData, int tileHeight, i
 			newRow[c]->setHeight(tileH);
 			newRow[c]->setType((Tile::TileType) mapData[r][c]); // Cast mapData int to TileType enum
 
+			if (newRow[c]->getType() == Tile::none)
+			{
+				newRow[c]->setEmpty(true);
+			}
+			else if (newRow[c]->getType() == Tile::player)
+			{
+				// player doesn't have a tile texture
+			}
+			else
+			{
+				// All other types should align with tile texture vector
+				newRow[c]->setTileTexture(tileTextures[mapData[r][c]]);
+			}
+			/*
 			switch(newRow[c]->getType())
 			{
 				case Tile::none:
 					newRow[c]->setEmpty(true);
 					break;
-				case Tile::dirt:
+				case Tile::dirt0:
 					newRow[c]->setTileTexture(tileTextures[0]);
 					break;
-				case Tile::grey:
+				case Tile::dirt1:
+					newRow[c]->setTileTexture(tileTextures[]);
+				case Tile::grey0:
 					newRow[c]->setTileTexture(tileTextures[3]);
 					break;
-				case Tile::orange:
+				case Tile::orange0:
 					newRow[c]->setTileTexture(tileTextures[6]);
 					break;
-				case Tile::cactus:
+				case Tile::cactus0:
 					newRow[c]->setTileTexture(tileTextures[9]);
 					break;
 				case Tile::player:
-					newRow[c]->setTileTexture(tileTextures[3]);
+					// currently no texture for player
 			}
+			*/
 		}
 
 		//move to next row
@@ -177,8 +180,6 @@ bool TileMap::loadMap(std::vector< std::vector<int> > mapData, int tileHeight, i
 
 void TileMap::saveMapFile(std::ofstream& externMapFile)
 {
-	//externMapFile.open("mapFile.txt");
-
 	for (int r=0; r<rows; r++)
 	{
 		for (int c=0; c<columns; c++)
@@ -200,9 +201,7 @@ void TileMap::updateTiles()
 {
 	double tempX = x;
 	double tempY = y;
-
-	// Update tiles in reverse, so that they stack as expected
-	// (not ideal, I'd prefer changing this later)
+	
 	for (int r=0; r < rows; r++)
 	{
 		// Set tile in each column
@@ -228,10 +227,22 @@ void TileMap::replaceTile(Tile* newTile, int row, int column)
 }
 
 
+Tile* TileMap::getTileAt(int row, int column)
+{
+	return tiles[row][column];
+}
+
+
 void TileMap::setTileEmpty(int row, int column)
 {
 	tiles[row][column] = new Tile();
 	tiles[row][column]->setEmpty(true);
+}
+
+
+bool TileMap::isTileEmpty(int row, int column)
+{
+	return tiles[row][column]->getEmpty();
 }
 
 
