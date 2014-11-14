@@ -23,6 +23,7 @@ class Game
 		//~Game();
 		int run();
 		void handleKey(SDL_Event);
+		void handleMouse(SDL_Event);
 		void playPageFlip();
 
 		void setQuit(bool boolIn) {quit = boolIn;}

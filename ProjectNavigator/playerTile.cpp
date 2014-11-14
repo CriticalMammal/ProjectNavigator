@@ -35,8 +35,8 @@ void Player::additionalAnimation()
 		{
 			animatedBlockGoal[i].x = randomNumber(x, x+width*z);
 			animatedBlockGoal[i].y = randomNumber(y, y+height*z);
-			//animatedBlockGoal[i].w = randomNumber(0, (x + width*z) - animatedBlockGoal[i].x);
-			//animatedBlockGoal[i].h = randomNumber(0, (y + height*z) - animatedBlockGoal[i].y);
+			animatedBlock[i].w = width*z/20;
+			animatedBlock[i].h = height*z/20;
 		}
 
 		prevAnimationTime = SDL_GetTicks();

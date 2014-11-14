@@ -47,10 +47,10 @@ int Game::run()
 	// Initialize variables
 	float prevTime = 0;
 	EventHandler eventHandler(*this);
-	//theMap.generateNewMap(300, 3, 30, 50, 50, renderer);
+	//theMap.generateNewMap(300, 10, 30, 50, 50, renderer);
 	theMap.loadMap("mapFile.csv", renderer);
 	theMap.setY(100);
-	theMap.setZ(1);
+	theMap.setZ(0.6);
 
 	tileEditorMenu;
 	tileEditorMenu.setTileImages(theMap.getTileTextures());
@@ -111,7 +111,6 @@ int Game::run()
 		SDL_RenderPresent(renderer);
 	}
 
-	//theMap.saveMap("mapFile.csv");
 	Mix_FadeOutChannel(channel, 2000);
 	while (Mix_FadingChannel(channel))
 	{
@@ -165,31 +164,53 @@ void Game::handleKey(SDL_Event event)
 					if (editMode == false) {theMap.findPlayerTile();} // Reset focus on player tile
 					tileEditorMenu.setMenuOpen(!tileEditorMenu.getMenuOpen());
 					break;
-				case SDLK_c:
-					leftClick = true;
+				case SDLK_LEFTBRACKET:
+					if (tileEditorMenu.getCurrentPage() > 0)
+						tileEditorMenu.setCurrentPage(tileEditorMenu.getCurrentPage()-1);
+					break;
+				case SDLK_RIGHTBRACKET:
+					if (tileEditorMenu.getCurrentPage() < tileEditorMenu.getMaxPages()-1)
+						tileEditorMenu.setCurrentPage(tileEditorMenu.getCurrentPage()+1);
 					break;
 				case SDLK_1:
-					theMap.randomizeLayerSpacing();
+					//theMap.setLayerSpacing(theMap.getLayerSpacing() - theMap.getLayerSpacing()/2);
+					theMap.setZ(theMap.getZ() - 0.1);
 					break;
 				case SDLK_2:
-					theMap.setLayerSpacing(theMap.getLayerSpacing() - theMap.getLayerSpacing()/2);
-					break;
-				case SDLK_3:
-					theMap.setLayerSpacing(theMap.getLayerSpacing() + 2*theMap.getLayerSpacing());
+					//theMap.setLayerSpacing(theMap.getLayerSpacing() + 2*theMap.getLayerSpacing());
+					theMap.setZ(theMap.getZ() + 0.1);
 					break;
 			}
 			break;
 		case SDL_KEYUP:
 			switch(event.key.keysym.sym)
 			{
-				case SDLK_UP:
-					// Do something
-					break;
 				case SDLK_c:
 					leftClick = false;
 					break;
 				case SDLK_F5:
 					theMap.saveMap("mapFile.csv");
+					break;
+			}
+			break;
+	}
+}
+
+
+void Game::handleMouse(SDL_Event event)
+{
+	switch (event.type)
+	{
+		case SDL_MOUSEBUTTONDOWN:
+			if (event.button.button == SDL_BUTTON_LEFT)
+			{
+				leftClick = true;
+			}
+			break;
+		case SDL_MOUSEBUTTONUP:
+			if (event.button.button == SDL_BUTTON_LEFT)
+			{
+				leftClick = false;
 			}
 			break;
 	}

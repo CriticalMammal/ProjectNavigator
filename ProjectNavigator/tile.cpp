@@ -24,6 +24,8 @@ Tile::Tile()
 	
 	width = 5;
 	height = 5;
+
+	isEditTile = false;
 }
 
 
@@ -49,7 +51,6 @@ void Tile::updateTile()
 
 	float newX = lerp(x, xLerp, goalX);
 	x = newX;
-	//x = goalX;
 
 	// Update y
 	if (y != goalY)
@@ -102,7 +103,7 @@ void Tile::additionalAnimation()
 
 SDL_Rect Tile::getRect()
 {
-	SDL_Rect tileRect = {x, y, width*z, height*z};
+	SDL_Rect tileRect = {x, y, width*z+1, height*z+1};
 	return tileRect;
 }
 

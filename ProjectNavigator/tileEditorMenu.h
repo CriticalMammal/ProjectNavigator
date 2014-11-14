@@ -7,8 +7,10 @@ class TileEditorMenu : public SideMenu
 {
 	private:
 		bool buttonImagesSet, menuMouseFocus, buttonClicked;
-		int buttonAmt, clickedButtonType;
-		std::vector<Button> buttons;
+		int menuPages, currentPage, buttonAmt, clickedButtonType;
+		int menuPadHeight, menuPadWidth, buttonWidth, buttonHeight,
+			buttonPad, buttonColumnWidth;
+		std::vector< std::vector<Button> > buttons;
 		std::vector<SDL_Texture*> tileImages;
 
 		bool pointCollisionCheck(double x, double y);
@@ -23,9 +25,12 @@ class TileEditorMenu : public SideMenu
 		int handleButtonClick();
 
 		void setTileImages(std::vector<SDL_Texture*> images) {tileImages = images;}
+		void setCurrentPage(int newPage) {currentPage = newPage;}
 
 		bool getMenuMouseFocus() {return menuMouseFocus;}
 		int getClickedButtonType() {return clickedButtonType;}
+		int getCurrentPage() {return currentPage;}
+		int getMaxPages() {return menuPages;}
 };
 
 #endif

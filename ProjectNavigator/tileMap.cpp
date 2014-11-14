@@ -66,14 +66,14 @@ bool TileMap::generateMap(int rowAmt, int columnAmt, double tileWidth, double ti
 			// Create ground level tiles
 			if (r == 0)
 			{
-				int randTexture = randomNumber(0, 8);
+				int randTexture = randomNumber(0, 3);
 				tiles[r][c]->setTileTexture(tileTextures[randTexture]);
 				tiles[r][c]->setType((Tile::TileType) randTexture);
 			}
 			// Cactus time
 			else if (randomNumber(0, 100) < 1 && tiles[r-1][c]->getEmpty() == false)
 			{
-				int randTexture = randomNumber(9, 12);
+				int randTexture = randomNumber(4, 21);
 				tiles[r][c]->setTileTexture(tileTextures[randTexture]);
 				tiles[r][c]->setType((Tile::TileType) randTexture);
 			}
@@ -96,7 +96,7 @@ bool TileMap::loadMap(std::vector< std::vector<int> > mapData, int tileHeight, i
 {
 	x = 0;
 	y = 0;
-	rows = mapData.size(); // WHY IS THERE AN EXTRA ROW????
+	rows = mapData.size();
 	columns = mapData[0].size();
 	tileH = tileHeight;
 	tileW = tileWidth;
@@ -142,30 +142,6 @@ bool TileMap::loadMap(std::vector< std::vector<int> > mapData, int tileHeight, i
 				// All other types should align with tile texture vector
 				newRow[c]->setTileTexture(tileTextures[mapData[r][c]]);
 			}
-			/*
-			switch(newRow[c]->getType())
-			{
-				case Tile::none:
-					newRow[c]->setEmpty(true);
-					break;
-				case Tile::dirt0:
-					newRow[c]->setTileTexture(tileTextures[0]);
-					break;
-				case Tile::dirt1:
-					newRow[c]->setTileTexture(tileTextures[]);
-				case Tile::grey0:
-					newRow[c]->setTileTexture(tileTextures[3]);
-					break;
-				case Tile::orange0:
-					newRow[c]->setTileTexture(tileTextures[6]);
-					break;
-				case Tile::cactus0:
-					newRow[c]->setTileTexture(tileTextures[9]);
-					break;
-				case Tile::player:
-					// currently no texture for player
-			}
-			*/
 		}
 
 		//move to next row
@@ -213,6 +189,18 @@ void TileMap::updateTiles()
 				tiles[r][c]->setY(tempY);
 				tiles[r][c]->setZ(z);
 				tiles[r][c]->updateTile();
+			}
+			else
+			{
+				// Only update the edit selection tile
+				if (tiles[r][c]->getIsEditTile())
+				{
+					tiles[r][c]->setX(tempX + (tileW + (tileW * z) * c));
+					tiles[r][c]->setY(tempY);
+					tiles[r][c]->setZ(z);
+					tiles[r][c]->updateTile();
+				}
+				
 			}
 		}
 

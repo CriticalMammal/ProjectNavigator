@@ -38,6 +38,12 @@ void EventHandler::handleEvents()
 			case SDL_KEYUP:
 				gameRef->handleKey(evt);
 				break;
+			case SDL_MOUSEBUTTONDOWN:
+				gameRef->handleMouse(evt);
+				break;
+			case SDL_MOUSEBUTTONUP:
+				gameRef->handleMouse(evt);
+				break;
 		}
 	}
 }

@@ -5,44 +5,55 @@
 #include "button.h"
 #include "tileEditorMenu.h"
 
+using namespace std;
 extern int mouseX, mouseY;
 
 
 TileEditorMenu::TileEditorMenu()
 {
-	menuOpen = false;
 	buttonImagesSet = false;
 	buttonClicked = false;
+	menuPages = 2;
+	currentPage = 0;
 	buttonAmt = 21;
-	int menuPadHeight = 15;
-	int menuPadWidth = 15;
+	menuPadHeight = 15;
+	menuPadWidth = 15;
 
-	int buttonWidth = 40;
-	int buttonHeight = 40;
+	buttonWidth = 40;
+	buttonHeight = 40;
 
-	int buttonPad = 7;
-	int buttonColumnWidth = 3;
+	buttonPad = 7;
+	buttonColumnWidth = 3;
 	int buttonRow = 0;
 
 	//create a loop to assign button positions
-	while (buttons.size() < buttonAmt)
+	for (int r = 0; r < menuPages; r++)
 	{
-		int buttonX = menuPadWidth;
+		vector<Button> buttonPage;
 
-		for (int w = 0; w<buttonColumnWidth; w++)
+		while(buttonPage.size() < buttonAmt)
 		{
-			Button tempButton;
-			buttons.push_back(tempButton);
+			int buttonX = menuPadWidth;
 
-			buttons.back().setX(buttonX);
-			buttons.back().setY(menuPadHeight + (buttonRow*buttonHeight) + (buttonRow*buttonPad));
-			buttons.back().setWidth(buttonWidth);
-			buttons.back().setHeight(buttonHeight);
+			for (int w = 0; w<buttonColumnWidth; w++)
+			{
+				Button tempButton;
 
-			buttonX += buttonWidth+buttonPad;
-		}
+				tempButton.setX(buttonX);
+				tempButton.setY(menuPadHeight + (buttonRow*buttonHeight) + (buttonRow*buttonPad));
+				tempButton.setWidth(buttonWidth);
+				tempButton.setHeight(buttonHeight);
+
+				buttonPage.push_back(tempButton);
+
+				buttonX += buttonWidth+buttonPad;
+			}
 		
-		buttonRow ++;
+			buttonRow ++;
+		}
+
+		buttons.push_back(buttonPage);
+		buttonRow = 0; //reset row for next page
 	}
 
 	menuRect.x = x;
@@ -64,17 +75,25 @@ void TileEditorMenu::updateTileEditor()
 	//if button images need to be updated
 	if (!buttonImagesSet)
 	{
-		for (int i=0; i<buttonAmt; i++)
+		int page = 0;
+
+		while (page < menuPages)
 		{
-			if (i < tileImages.size())
+			for (int i=0; i<buttonAmt; i++)
 			{
-				buttons[i].setImage(tileImages[i]);
+				if (i+(page*buttonAmt) < tileImages.size())
+				{
+					buttons[page][i].setImage(tileImages[i+(page*buttonAmt)]);
+				}
+				else
+				{
+					buttons[page][i].setImage(tileImages[0]);
+				}
 			}
-			else
-			{
-				buttons[i].setImage(tileImages[0]);
-			}
+
+			page ++;
 		}
+
 		buttonImagesSet = true;
 	}
 
@@ -82,13 +101,13 @@ void TileEditorMenu::updateTileEditor()
 	//normal button updates
 	for (int i=0; i<buttonAmt; i++)
 	{
-		buttons[i].setMenuXOffset(x);
-		buttons[i].setMenuYOffset(y);
-		buttons[i].update();
+		buttons[currentPage][i].setMenuXOffset(x);
+		buttons[currentPage][i].setMenuYOffset(y);
+		buttons[currentPage][i].update();
 
-		if (buttons[i].getButtonClicked())
+		if (buttons[currentPage][i].getButtonClicked())
 		{
-			clickedButtonType = i;
+			clickedButtonType = i + currentPage*buttonAmt;
 			buttonClicked = true;
 			break;
 		}
@@ -134,7 +153,7 @@ void TileEditorMenu::drawButtons(SDL_Renderer* renderer)
 {
 	for (int i=0; i<buttonAmt; i++)
 	{
-		buttons[i].draw(renderer);
+		buttons[currentPage][i].draw(renderer);
 	}
 }
 

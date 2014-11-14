@@ -10,11 +10,14 @@ class Tile
 		enum TileType 
 		{
 			dirt0 = 0,    dirt1 = 1,    dirt2 = 2, 
-			orange0 = 3,  orange1 = 4,  orange2 = 5, 
-			grey0 = 6,    grey1 = 7,    grey2 = 8, 
-			cactus0 = 9,  cactus1 = 10, cactus2 = 11, 
-			none = 12, 
-			player = 13
+			wall0 = 3,    wall1 = 4,    wall2 = 5, 
+			window0 = 6,  window1 = 7,  window2 = 8, 
+			roof0 = 9,    roof1 = 10,   roof2 = 11, 
+			pillar0 = 12, pillar1 = 13, pillar2 = 14, 
+			arch0 = 15,   arch1 = 16,   arch2 = 17, 
+			cactus0 = 18, cactus1 = 19, cactus2 = 20, 
+			none = 21, 
+			player = 22
 		};
 		void updateTile();
 		SDL_Rect getRect();
@@ -30,6 +33,7 @@ class Tile
 		void setWidth(float newW) {width = newW;}
 		void setHeight(float newH) {height = newH;}
 		void setEmpty(bool boolIn) {empty = boolIn;}
+		void setIsEditTile(bool boolIn) {isEditTile = boolIn;}
 
 		//get functions
 		bool getCollision() {return collision;}
@@ -41,6 +45,7 @@ class Tile
 		float getWidth() {return width;}
 		float getHeight() {return height;}
 		bool getEmpty() {return empty;}
+		bool getIsEditTile() {return isEditTile;}
 
 	protected:
 		TileType type;
@@ -50,7 +55,7 @@ class Tile
 		float goalX, goalY, goalZ;
 		float xLerp, yLerp, zLerp;
 		float width, height;
-		bool empty;
+		bool empty, isEditTile;
 
 		virtual void additionalAnimation();
 		float lerp(float, float, float);

@@ -218,6 +218,16 @@ void GameMap::updateMap()
 	{
 		findPlayerTile();
 	}
+
+	// Update map based on focus position
+	//x = xOffset - focusLocation.column*(tileW*focusLocation.tile->getZ());
+	/*
+	centerLayer = focusLocation.layer-playerCloseness;
+	if (centerLayer <= 0)
+	{
+		centerLayer = 0;
+	}
+	*/
 	
 	layers[centerLayer]->setX(x);
 	
@@ -232,11 +242,12 @@ void GameMap::updateMap()
 	for (int i=startLayer; i<endLayer; i++)
 	{
 		float distFromCenter = i - centerLayer;
-
 		//layers[i]->setY(layers[i]->getY() + distFromCenter * (distFromCenter/2));
 		layers[i]->setY(y + distFromCenter * (distFromCenter/2));
-
+		
 		distFromCenter /= layerSpacing;
+		//cout << distFromCenter << endl;
+		
 		float newWidth = x + (tileW*distFromCenter) * layers[centerLayer]->getColumnCount();
 		float newX = x - ((newWidth - originalWidth)/2);
 
@@ -244,6 +255,14 @@ void GameMap::updateMap()
 		layers[i]->setZ(z+distFromCenter);
 
 		layers[i]->updateTiles();
+	}
+
+	// Update map based on focus position (Should you really be doing this again in focus movement?)
+	x = xOffset - focusLocation.column*(tileW*focusLocation.tile->getZ());
+	centerLayer = focusLocation.layer-playerCloseness;
+	if (centerLayer <= 0)
+	{
+		centerLayer = 0;
 	}
 } // END updateMap()
 
@@ -289,16 +308,17 @@ void GameMap::moveFocusForward()
 		}
 		else if (editMode == true)
 		{
+			focusLocation.tile->setIsEditTile(false);
 			focusLocation.layer -= 1;
 			focusLocation.tile = layers[focusLocation.layer]->getTileAt(focusLocation.row, focusLocation.column);
+			focusLocation.tile->setIsEditTile(true);
 		}
-	}
 
-	centerLayer = focusLocation.layer-playerCloseness;
-
-	if (centerLayer <= 0)
-	{
-		centerLayer = 0;
+		centerLayer = focusLocation.layer-playerCloseness;
+		if (centerLayer <= 0)
+		{
+			centerLayer = 0;
+		}
 	}
 }
 
@@ -316,16 +336,17 @@ void GameMap::moveFocusBackward()
 		}
 		else if (editMode == true)
 		{
+			focusLocation.tile->setIsEditTile(false);
 			focusLocation.layer += 1;
 			focusLocation.tile = layers[focusLocation.layer]->getTileAt(focusLocation.row, focusLocation.column);
+			focusLocation.tile->setIsEditTile(true);
 		}
-	}
 
-	centerLayer = focusLocation.layer-playerCloseness;
-
-	if (centerLayer >= layers.size())
-	{
-		centerLayer = layers.size()-1;
+		centerLayer = focusLocation.layer-playerCloseness;
+		if (centerLayer <= 0)
+		{
+			centerLayer = 0;
+		}
 	}
 }
 
@@ -343,14 +364,14 @@ void GameMap::moveFocusLeft()
 		}
 		else if (editMode == true)
 		{
+			focusLocation.tile->setIsEditTile(false);
 			focusLocation.column -= 1;
 			focusLocation.tile = layers[focusLocation.layer]->getTileAt(focusLocation.row, focusLocation.column);
+			focusLocation.tile->setIsEditTile(true);
 		}
+
+		x = xOffset - focusLocation.column*(tileW*focusLocation.tile->getZ());
 	}
-	
-	int layerFromMid = focusLocation.layer - centerLayer;
-	float sizeChange = (float) layerFromMid / (maxLayersDisplayed/2);
-	x = xOffset - focusLocation.column*(tileW + (tileW*sizeChange));
 }
 
 
@@ -367,14 +388,14 @@ void GameMap::moveFocusRight()
 		}
 		else if (editMode == true)
 		{
+			focusLocation.tile->setIsEditTile(false);
 			focusLocation.column += 1;
 			focusLocation.tile = layers[focusLocation.layer]->getTileAt(focusLocation.row, focusLocation.column);
+			focusLocation.tile->setIsEditTile(true);
 		}
+
+		x = xOffset - focusLocation.column*(tileW*focusLocation.tile->getZ());
 	}
-		
-	int layerFromMid = focusLocation.layer - centerLayer;
-	float sizeChange = (float) layerFromMid / (maxLayersDisplayed/2);
-	x = xOffset - focusLocation.column*(tileW + (tileW*sizeChange));
 }
 
 
@@ -391,14 +412,12 @@ void GameMap::moveFocusUp()
 		}
 		else if (editMode == true)
 		{
+			focusLocation.tile->setIsEditTile(false);
 			focusLocation.row += 1;
 			focusLocation.tile = layers[focusLocation.layer]->getTileAt(focusLocation.row, focusLocation.column);
+			focusLocation.tile->setIsEditTile(true);
 		}
 	}
-		
-	int layerFromMid = focusLocation.layer - centerLayer;
-	float sizeChange = (float) layerFromMid / (maxLayersDisplayed/2);
-	x = xOffset - focusLocation.column*(tileW + (tileW*sizeChange));
 }
 
 
@@ -415,14 +434,12 @@ void GameMap::moveFocusDown()
 		}
 		else if (editMode == true)
 		{
+			focusLocation.tile->setIsEditTile(false);
 			focusLocation.row -= 1;
 			focusLocation.tile = layers[focusLocation.layer]->getTileAt(focusLocation.row, focusLocation.column);
+			focusLocation.tile->setIsEditTile(true);
 		}
 	}
-
-	int layerFromMid = focusLocation.layer - centerLayer;
-	float sizeChange = (float) layerFromMid / (maxLayersDisplayed/2);
-	x = xOffset - focusLocation.column*(tileW + (tileW*sizeChange));
 }
 
 
@@ -459,6 +476,12 @@ void GameMap::drawMap(SDL_Rect screenRect, SDL_Renderer* renderer)
 	for (int i=startLayer; i<endLayer; i++)
 	{
 		layers[i]->drawTileMap(screenRect, renderer);
+		if (editMode == true && focusLocation.layer == i)
+		{
+			SDL_SetRenderDrawColor(renderer, 0, 0, 0, 70);
+			SDL_RenderDrawRect(renderer, &focusLocation.tile->getRect());
+			SDL_RenderFillRect(renderer, &focusLocation.tile->getRect());
+		}
 	}
 } // END drawMap()
 
