@@ -59,7 +59,7 @@ bool GameMap::generateNewMap(int layerCountIn, int layerRowAmt, int layerColumnA
 	tileH = tileHeight;
 	layerCount = layerCountIn;
 	centerLayer = layerCount/2;
-	maxLayersDisplayed = 80;
+	maxLayersDisplayed = 3;
 
 	{
 		playerCloseness = 20;
@@ -231,10 +231,16 @@ void GameMap::updateMap()
 	
 	layers[centerLayer]->setX(x);
 	
+	/*
 	int startLayer = centerLayer-(maxLayersDisplayed/2);
 	if (startLayer < 0) {startLayer = 0;}
 	int endLayer = startLayer + maxLayersDisplayed;
 	if (endLayer > layerCount) {endLayer = layerCount;}
+	*/
+	int startLayer = focusLocation.layer - (maxLayersDisplayed/2);
+	if (startLayer < 0) {startLayer = 0;}
+	int endLayer = startLayer + maxLayersDisplayed;
+	if (endLayer > layers.size()) {endLayer = layers.size();}
 
 	float originalWidth = layers[centerLayer]->getX() + tileW * layers[centerLayer]->getColumnCount();
 
@@ -468,7 +474,13 @@ void GameMap::setFocusTile(int tileType)
 
 void GameMap::drawMap(SDL_Rect screenRect, SDL_Renderer* renderer)
 {
+	/*
 	int startLayer = centerLayer-(maxLayersDisplayed/2);
+	if (startLayer < 0) {startLayer = 0;}
+	int endLayer = startLayer + maxLayersDisplayed;
+	if (endLayer > layers.size()) {endLayer = layers.size();}
+	*/
+	int startLayer = focusLocation.layer - (maxLayersDisplayed/2);
 	if (startLayer < 0) {startLayer = 0;}
 	int endLayer = startLayer + maxLayersDisplayed;
 	if (endLayer > layers.size()) {endLayer = layers.size();}
