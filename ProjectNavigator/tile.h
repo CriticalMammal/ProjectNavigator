@@ -21,7 +21,9 @@ class Tile
 		};
 		void updateTile();
 		SDL_Rect getRect();
-		bool isMovementAllowed();
+		bool canMove();
+		bool canFall();
+		bool canJump();
 		virtual void draw(SDL_Renderer* renderer);
 
 		//set functions
@@ -57,6 +59,8 @@ class Tile
 		float xLerp, yLerp, zLerp;
 		float width, height;
 		float movementWaitTime, prevMovementTime;
+		float airWaitTime, prevAirTime;
+		float jumpWaitTime, prevJumpTime;
 		bool empty, isEditTile;
 
 		virtual void additionalAnimation();

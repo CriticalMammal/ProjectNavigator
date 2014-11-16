@@ -147,6 +147,7 @@ void Game::handleKey(SDL_Event event)
 					theMap.moveLeft = true;
 					break;
 				case SDLK_r:
+				case SDLK_SPACE:
 					theMap.moveUp = true;
 					break;
 				case SDLK_f:
@@ -196,6 +197,7 @@ void Game::handleKey(SDL_Event event)
 					theMap.moveLeft = false;
 					break;
 				case SDLK_r:
+				case SDLK_SPACE:
 					theMap.moveUp = false;
 					break;
 				case SDLK_f:

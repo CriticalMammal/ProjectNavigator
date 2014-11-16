@@ -185,9 +185,10 @@ void TileMap::updateTiles()
 		{
 			if (tiles[r][c]->getEmpty() == false) // Don't update empty tiles
 			{
-				// Gravity...?
+				// Basic Gravity
 				if (r-1 >= 0 && tiles[r-1][c]->getEmpty() == true &&
-					tiles[r][c]->getType() != Tile::player)
+					tiles[r][c]->getType() != Tile::player &&
+					tiles[r][c]->canMove())
 				{
 					replaceTile(tiles[r][c], r-1, c);
 					setTileEmpty(r, c);

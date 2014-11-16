@@ -307,7 +307,7 @@ void GameMap::findPlayerTile()
 
 void GameMap::moveFocusForward()
 {
-	if (moveForward == true && focusLocation.tile->isMovementAllowed())
+	if (moveForward == true && focusLocation.tile->canMove())
 	{
 		if (editMode == false && 
 			layers[focusLocation.layer-1]->isTileEmpty(focusLocation.row, focusLocation.column))
@@ -330,7 +330,7 @@ void GameMap::moveFocusForward()
 			}
 			focusLocation.tile = layers[focusLocation.layer]->getTileAt(focusLocation.row, focusLocation.column);
 			focusLocation.tile->setIsEditTile(true);
-			focusLocation.tile->isMovementAllowed(); // Reset the movement time
+			focusLocation.tile->canMove(); // Reset the movement time
 		}
 		/*
 		centerLayer = focusLocation.layer-playerCloseness;
@@ -345,7 +345,7 @@ void GameMap::moveFocusForward()
 
 void GameMap::moveFocusBackward()
 {
-	if (moveBackward == true && focusLocation.tile->isMovementAllowed())
+	if (moveBackward == true && focusLocation.tile->canMove())
 	{
 		if (editMode == false && 
 			layers[focusLocation.layer+1]->isTileEmpty(focusLocation.row, focusLocation.column))
@@ -368,7 +368,7 @@ void GameMap::moveFocusBackward()
 			}
 			focusLocation.tile = layers[focusLocation.layer]->getTileAt(focusLocation.row, focusLocation.column);
 			focusLocation.tile->setIsEditTile(true);
-			focusLocation.tile->isMovementAllowed(); // Reset the movement time
+			focusLocation.tile->canMove(); // Reset the movement time
 		}
 		/*
 		centerLayer = focusLocation.layer-playerCloseness;
@@ -384,7 +384,7 @@ void GameMap::moveFocusBackward()
 void GameMap::moveFocusLeft()
 {
 	if (moveLeft == true && focusLocation.column-1 >= 0 && 
-		focusLocation.tile->isMovementAllowed())
+		focusLocation.tile->canMove())
 	{
 		if (editMode == false && 
 			layers[focusLocation.layer]->isTileEmpty(focusLocation.row, focusLocation.column-1))
@@ -399,7 +399,7 @@ void GameMap::moveFocusLeft()
 			focusLocation.column -= 1;
 			focusLocation.tile = layers[focusLocation.layer]->getTileAt(focusLocation.row, focusLocation.column);
 			focusLocation.tile->setIsEditTile(true);
-			focusLocation.tile->isMovementAllowed(); // Reset the movement time
+			focusLocation.tile->canMove(); // Reset the movement time
 		}
 
 		x = xOffset - focusLocation.column*(tileW*focusLocation.tile->getZ());
@@ -410,7 +410,7 @@ void GameMap::moveFocusLeft()
 void GameMap::moveFocusRight()
 {
 	if (moveRight == true && focusLocation.column+1 < layers[focusLocation.layer]->getColumnCount()
-		 && focusLocation.tile->isMovementAllowed())
+		 && focusLocation.tile->canMove())
 	{
 		if (editMode == false && 
 			layers[focusLocation.layer]->isTileEmpty(focusLocation.row, focusLocation.column+1))
@@ -425,7 +425,7 @@ void GameMap::moveFocusRight()
 			focusLocation.column += 1;
 			focusLocation.tile = layers[focusLocation.layer]->getTileAt(focusLocation.row, focusLocation.column);
 			focusLocation.tile->setIsEditTile(true);
-			focusLocation.tile->isMovementAllowed(); // Reset the movement time
+			focusLocation.tile->canMove(); // Reset the movement time
 		}
 
 		x = xOffset - focusLocation.column*(tileW*focusLocation.tile->getZ());
@@ -435,23 +435,24 @@ void GameMap::moveFocusRight()
 
 void GameMap::moveFocusUp()
 {
-	if (moveUp == true && focusLocation.row+1 < layers[focusLocation.layer]->getRowCount() &&
-		focusLocation.tile->isMovementAllowed())
+	if (moveUp == true && focusLocation.row+1 < layers[focusLocation.layer]->getRowCount())
 	{
 		if (editMode == false && 
-			layers[focusLocation.layer]->isTileEmpty(focusLocation.row+1, focusLocation.column))
+			layers[focusLocation.layer]->isTileEmpty(focusLocation.row+1, focusLocation.column) &&
+			focusLocation.tile->canJump())
 		{
 			layers[focusLocation.layer]->setTileEmpty(focusLocation.row, focusLocation.column);
 			focusLocation.row += 1;
 			layers[focusLocation.layer]->replaceTile(focusLocation.tile, focusLocation.row, focusLocation.column);
+			focusLocation.tile->canFall(); // Reset falling time
 		}
-		else if (editMode == true)
+		else if (editMode == true && focusLocation.tile->canMove())
 		{
 			focusLocation.tile->setIsEditTile(false);
 			focusLocation.row += 1;
 			focusLocation.tile = layers[focusLocation.layer]->getTileAt(focusLocation.row, focusLocation.column);
 			focusLocation.tile->setIsEditTile(true);
-			focusLocation.tile->isMovementAllowed(); // Reset the movement time
+			focusLocation.tile->canMove(); // Reset the movement time
 		}
 
 		y = yOffset + focusLocation.row * (tileH * focusLocation.tile->getZ());
@@ -462,7 +463,7 @@ void GameMap::moveFocusUp()
 void GameMap::moveFocusDown()
 {
 	if (moveDown == true && focusLocation.row-1 >= 0 && 
-		focusLocation.tile->isMovementAllowed())
+		focusLocation.tile->canMove())
 	{
 		if (editMode == false && 
 			layers[focusLocation.layer]->isTileEmpty(focusLocation.row-1, focusLocation.column))
@@ -477,7 +478,7 @@ void GameMap::moveFocusDown()
 			focusLocation.row -= 1;
 			focusLocation.tile = layers[focusLocation.layer]->getTileAt(focusLocation.row, focusLocation.column);
 			focusLocation.tile->setIsEditTile(true);
-			focusLocation.tile->isMovementAllowed(); // Reset the movement time
+			focusLocation.tile->canMove(); // Reset the movement time
 		}
 
 		y = yOffset + focusLocation.row * (tileH * focusLocation.tile->getZ());
@@ -487,7 +488,8 @@ void GameMap::moveFocusDown()
 
 void GameMap::updateFocusTile()
 {
-	// If in edit mode, don't use gravity
+	// If in edit mode, don't use gravity or if on bottom
+	// level of the map
 	if (focusLocation.tile->getIsEditTile() == true ||
 		focusLocation.row-1 < 0)
 	{
@@ -499,7 +501,8 @@ void GameMap::updateFocusTile()
 	// Updates focus tile's gravity
 	Tile *tileBelowFocus = layers[focusLocation.layer]->getTileAt(focusLocation.row-1, focusLocation.column);
 
-	if (focusLocation.row-1 >= 0 && tileBelowFocus->getEmpty() == true)
+	if (focusLocation.row-1 >= 0 && tileBelowFocus->getEmpty() == true &&
+		focusLocation.tile->canFall())
 	{
 		layers[focusLocation.layer]->setTileEmpty(focusLocation.row, focusLocation.column);
 		focusLocation.row --;

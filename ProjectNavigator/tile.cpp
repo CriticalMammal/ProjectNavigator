@@ -27,6 +27,10 @@ Tile::Tile()
 
 	prevMovementTime = SDL_GetTicks();
 	movementWaitTime = 0.2*1000; // In milliseconds
+	prevJumpTime = SDL_GetTicks();
+	jumpWaitTime = 1*1000;
+	prevAirTime = SDL_GetTicks();
+	airWaitTime = 0.5*1000;
 
 	isEditTile = false;
 }
@@ -90,13 +94,45 @@ void Tile::updateTile()
 }
 
 
-bool Tile::isMovementAllowed()
+bool Tile::canMove()
 {
 	// Check if the tile has waited long enough
 	// to move
 	if (SDL_GetTicks() - prevMovementTime >= movementWaitTime)
 	{
 		prevMovementTime = SDL_GetTicks();
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+
+bool Tile::canFall()
+{
+	// Check to see if tile has been in air
+	// long enough
+	if (SDL_GetTicks() - prevAirTime >= airWaitTime)
+	{
+		prevAirTime = SDL_GetTicks();
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+
+bool Tile::canJump()
+{
+	// Check to see if tile has waited
+	// long enough to jump
+	if (SDL_GetTicks() - prevJumpTime >= jumpWaitTime)
+	{
+		prevJumpTime = SDL_GetTicks();
 		return true;
 	}
 	else
