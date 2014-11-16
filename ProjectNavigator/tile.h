@@ -21,6 +21,7 @@ class Tile
 		};
 		void updateTile();
 		SDL_Rect getRect();
+		bool isMovementAllowed();
 		virtual void draw(SDL_Renderer* renderer);
 
 		//set functions
@@ -55,6 +56,7 @@ class Tile
 		float goalX, goalY, goalZ;
 		float xLerp, yLerp, zLerp;
 		float width, height;
+		float movementWaitTime, prevMovementTime;
 		bool empty, isEditTile;
 
 		virtual void additionalAnimation();

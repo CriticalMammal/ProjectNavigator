@@ -8,6 +8,9 @@
 class GameMap
 {
 	public:
+		bool moveLeft, moveRight, moveForward,
+			moveBackward, moveUp, moveDown;
+
 		GameMap();
 		~GameMap();
 		bool generateNewMap(int layers, int layerRowAmt, int layerColumnAmt,
@@ -24,6 +27,7 @@ class GameMap
 		void moveFocusBackward();
 		void moveFocusUp();
 		void moveFocusDown();
+		void updateFocusTile();
 		void setFocusTile(int tileType);
 
 		struct tileLocation

@@ -8,7 +8,6 @@ Player::Player()
 {
 	prevAnimationTime = SDL_GetTicks();
 	animationWaitTime = 0.1*1000; // In milliseconds
-	movementWaitTime = 0.5*1000;
 
 	int shiftingBlockCount = 10;
 
@@ -28,7 +27,7 @@ Player::~Player()
 
 void Player::additionalAnimation()
 {
-	// Check if it's time to update
+	// Check if it's time to update animations
 	if (SDL_GetTicks()-prevAnimationTime >= animationWaitTime)
 	{
 		for (int i=0; i<animatedBlockGoal.size(); i++)

@@ -185,6 +185,14 @@ void TileMap::updateTiles()
 		{
 			if (tiles[r][c]->getEmpty() == false) // Don't update empty tiles
 			{
+				// Gravity...?
+				if (r-1 >= 0 && tiles[r-1][c]->getEmpty() == true &&
+					tiles[r][c]->getType() != Tile::player)
+				{
+					replaceTile(tiles[r][c], r-1, c);
+					setTileEmpty(r, c);
+				}
+				
 				tiles[r][c]->setX(tempX + (tileW + (tileW * z) * c));
 				tiles[r][c]->setY(tempY);
 				tiles[r][c]->setZ(z);
@@ -223,6 +231,8 @@ Tile* TileMap::getTileAt(int row, int column)
 
 void TileMap::setTileEmpty(int row, int column)
 {
+	// You should have a "reset" function in tile class rather than creating a
+	// new tile every time this fuction is called.
 	tiles[row][column] = new Tile();
 	tiles[row][column]->setEmpty(true);
 }

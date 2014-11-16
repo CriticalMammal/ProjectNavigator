@@ -25,6 +25,9 @@ Tile::Tile()
 	width = 5;
 	height = 5;
 
+	prevMovementTime = SDL_GetTicks();
+	movementWaitTime = 0.2*1000; // In milliseconds
+
 	isEditTile = false;
 }
 
@@ -84,6 +87,22 @@ void Tile::updateTile()
 	z = newZ;
 
 	additionalAnimation();
+}
+
+
+bool Tile::isMovementAllowed()
+{
+	// Check if the tile has waited long enough
+	// to move
+	if (SDL_GetTicks() - prevMovementTime >= movementWaitTime)
+	{
+		prevMovementTime = SDL_GetTicks();
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 

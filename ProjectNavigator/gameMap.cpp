@@ -39,6 +39,13 @@ GameMap::GameMap()
 	layerSpacing = 40;
 	playerCloseness = 20;
 	editMode = false;
+
+	moveUp = false;
+	moveDown = false;
+	moveLeft = false;
+	moveRight = false;
+	moveForward = false;
+	moveBackward = false;
 }
 
 
@@ -222,6 +229,13 @@ void GameMap::updateMap()
 		findPlayerTile();
 	}
 	
+	moveFocusForward();
+	moveFocusBackward();
+	moveFocusUp();
+	moveFocusDown();
+	moveFocusLeft();
+	moveFocusRight();
+	
 	layers[centerLayer]->setX(x);
 	
 	int startLayer = focusLocation.layer - (maxLayersDisplayed/2);
@@ -248,13 +262,17 @@ void GameMap::updateMap()
 		layers[i]->updateTiles();
 	}
 
+	updateFocusTile();
+	
 	// Update map based on focus position (Should you really be doing this again in focus movement?)
 	x = xOffset - focusLocation.column*(tileW*focusLocation.tile->getZ());
+	y = yOffset + focusLocation.row * (tileH * focusLocation.tile->getZ());
 	centerLayer = focusLocation.layer-playerCloseness;
 	if (centerLayer <= 0)
 	{
 		centerLayer = 0;
 	}
+	
 } // END updateMap()
 
 
@@ -268,6 +286,7 @@ void GameMap::findPlayerTile()
 
 		if (focusLocation.tile != nullptr)
 		{
+			// Update position info
 			focusLocation.row = playerInfo.row;
 			focusLocation.column = playerInfo.column;
 			focusLocation.layer = i;
@@ -288,63 +307,84 @@ void GameMap::findPlayerTile()
 
 void GameMap::moveFocusForward()
 {
-	if (focusLocation.layer-1 > 0)
+	if (moveForward == true && focusLocation.tile->isMovementAllowed())
 	{
 		if (editMode == false && 
 			layers[focusLocation.layer-1]->isTileEmpty(focusLocation.row, focusLocation.column))
 		{
 			layers[focusLocation.layer]->setTileEmpty(focusLocation.row, focusLocation.column);
 			focusLocation.layer -= 1;
+			if (focusLocation.layer-1 <= 0)
+			{
+				focusLocation.layer = layers.size()-2;
+			}
 			layers[focusLocation.layer]->replaceTile(focusLocation.tile ,focusLocation.row, focusLocation.column);
 		}
 		else if (editMode == true)
 		{
 			focusLocation.tile->setIsEditTile(false);
 			focusLocation.layer -= 1;
+			if (focusLocation.layer-1 <= 0)
+			{
+				focusLocation.layer = layers.size()-2;
+			}
 			focusLocation.tile = layers[focusLocation.layer]->getTileAt(focusLocation.row, focusLocation.column);
 			focusLocation.tile->setIsEditTile(true);
+			focusLocation.tile->isMovementAllowed(); // Reset the movement time
 		}
-
+		/*
 		centerLayer = focusLocation.layer-playerCloseness;
 		if (centerLayer <= 0)
 		{
 			centerLayer = 0;
 		}
+		*/
 	}
 }
 
 
 void GameMap::moveFocusBackward()
 {
-	if (focusLocation.layer+1 < layers.size())
+	if (moveBackward == true && focusLocation.tile->isMovementAllowed())
 	{
 		if (editMode == false && 
 			layers[focusLocation.layer+1]->isTileEmpty(focusLocation.row, focusLocation.column))
 		{
 			layers[focusLocation.layer]->setTileEmpty(focusLocation.row, focusLocation.column);
 			focusLocation.layer += 1;
+			if (focusLocation.layer >= layers.size()-1)
+			{
+				focusLocation.layer = 1;
+			}
 			layers[focusLocation.layer]->replaceTile(focusLocation.tile ,focusLocation.row, focusLocation.column);
 		}
 		else if (editMode == true)
 		{
 			focusLocation.tile->setIsEditTile(false);
 			focusLocation.layer += 1;
+			if (focusLocation.layer >= layers.size()-1)
+			{
+				focusLocation.layer = 1;
+			}
 			focusLocation.tile = layers[focusLocation.layer]->getTileAt(focusLocation.row, focusLocation.column);
 			focusLocation.tile->setIsEditTile(true);
+			focusLocation.tile->isMovementAllowed(); // Reset the movement time
 		}
-
+		/*
 		centerLayer = focusLocation.layer-playerCloseness;
 		if (centerLayer <= 0)
 		{
 			centerLayer = 0;
 		}
+		*/
 	}
 }
 
 
 void GameMap::moveFocusLeft()
 {
-	if (focusLocation.column-1 >= 0)
+	if (moveLeft == true && focusLocation.column-1 >= 0 && 
+		focusLocation.tile->isMovementAllowed())
 	{
 		if (editMode == false && 
 			layers[focusLocation.layer]->isTileEmpty(focusLocation.row, focusLocation.column-1))
@@ -359,6 +399,7 @@ void GameMap::moveFocusLeft()
 			focusLocation.column -= 1;
 			focusLocation.tile = layers[focusLocation.layer]->getTileAt(focusLocation.row, focusLocation.column);
 			focusLocation.tile->setIsEditTile(true);
+			focusLocation.tile->isMovementAllowed(); // Reset the movement time
 		}
 
 		x = xOffset - focusLocation.column*(tileW*focusLocation.tile->getZ());
@@ -368,7 +409,8 @@ void GameMap::moveFocusLeft()
 
 void GameMap::moveFocusRight()
 {
-	if (focusLocation.column+1 < layers[focusLocation.layer]->getColumnCount())
+	if (moveRight == true && focusLocation.column+1 < layers[focusLocation.layer]->getColumnCount()
+		 && focusLocation.tile->isMovementAllowed())
 	{
 		if (editMode == false && 
 			layers[focusLocation.layer]->isTileEmpty(focusLocation.row, focusLocation.column+1))
@@ -383,6 +425,7 @@ void GameMap::moveFocusRight()
 			focusLocation.column += 1;
 			focusLocation.tile = layers[focusLocation.layer]->getTileAt(focusLocation.row, focusLocation.column);
 			focusLocation.tile->setIsEditTile(true);
+			focusLocation.tile->isMovementAllowed(); // Reset the movement time
 		}
 
 		x = xOffset - focusLocation.column*(tileW*focusLocation.tile->getZ());
@@ -392,7 +435,8 @@ void GameMap::moveFocusRight()
 
 void GameMap::moveFocusUp()
 {
-	if (focusLocation.row+1 < layers[focusLocation.layer]->getRowCount())
+	if (moveUp == true && focusLocation.row+1 < layers[focusLocation.layer]->getRowCount() &&
+		focusLocation.tile->isMovementAllowed())
 	{
 		if (editMode == false && 
 			layers[focusLocation.layer]->isTileEmpty(focusLocation.row+1, focusLocation.column))
@@ -407,6 +451,7 @@ void GameMap::moveFocusUp()
 			focusLocation.row += 1;
 			focusLocation.tile = layers[focusLocation.layer]->getTileAt(focusLocation.row, focusLocation.column);
 			focusLocation.tile->setIsEditTile(true);
+			focusLocation.tile->isMovementAllowed(); // Reset the movement time
 		}
 
 		y = yOffset + focusLocation.row * (tileH * focusLocation.tile->getZ());
@@ -416,7 +461,8 @@ void GameMap::moveFocusUp()
 
 void GameMap::moveFocusDown()
 {
-	if (focusLocation.row-1 >= 0)
+	if (moveDown == true && focusLocation.row-1 >= 0 && 
+		focusLocation.tile->isMovementAllowed())
 	{
 		if (editMode == false && 
 			layers[focusLocation.layer]->isTileEmpty(focusLocation.row-1, focusLocation.column))
@@ -431,8 +477,33 @@ void GameMap::moveFocusDown()
 			focusLocation.row -= 1;
 			focusLocation.tile = layers[focusLocation.layer]->getTileAt(focusLocation.row, focusLocation.column);
 			focusLocation.tile->setIsEditTile(true);
+			focusLocation.tile->isMovementAllowed(); // Reset the movement time
 		}
 
+		y = yOffset + focusLocation.row * (tileH * focusLocation.tile->getZ());
+	}
+}
+
+
+void GameMap::updateFocusTile()
+{
+	// If in edit mode, don't use gravity
+	if (focusLocation.tile->getIsEditTile() == true ||
+		focusLocation.row-1 < 0)
+	{
+		return;
+	}
+
+	//Perhaps if you check periodically for the focus tile you
+	// wouldn't need to specifically update the focus tile
+	// Updates focus tile's gravity
+	Tile *tileBelowFocus = layers[focusLocation.layer]->getTileAt(focusLocation.row-1, focusLocation.column);
+
+	if (focusLocation.row-1 >= 0 && tileBelowFocus->getEmpty() == true)
+	{
+		layers[focusLocation.layer]->setTileEmpty(focusLocation.row, focusLocation.column);
+		focusLocation.row --;
+		layers[focusLocation.layer]->replaceTile(focusLocation.tile, focusLocation.row, focusLocation.column);
 		y = yOffset + focusLocation.row * (tileH * focusLocation.tile->getZ());
 	}
 }

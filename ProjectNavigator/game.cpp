@@ -132,25 +132,25 @@ void Game::handleKey(SDL_Event event)
 					break;
 				case SDLK_UP:
 				case SDLK_w:
-					theMap.moveFocusForward();
+					theMap.moveForward = true;
 					break;
 				case SDLK_DOWN:
 				case SDLK_s:
-					theMap.moveFocusBackward();
+					theMap.moveBackward = true;
 					break;
 				case SDLK_RIGHT:
 				case SDLK_d:
-					theMap.moveFocusRight();
+					theMap.moveRight = true;
 					break;
 				case SDLK_LEFT:
 				case SDLK_a:
-					theMap.moveFocusLeft();
+					theMap.moveLeft = true;
 					break;
 				case SDLK_r:
-					theMap.moveFocusUp();
+					theMap.moveUp = true;
 					break;
 				case SDLK_f:
-					theMap.moveFocusDown();
+					theMap.moveDown = true;
 					break;
 				case SDLK_TAB:
 					editMode = !editMode;
@@ -179,6 +179,28 @@ void Game::handleKey(SDL_Event event)
 		case SDL_KEYUP:
 			switch(event.key.keysym.sym)
 			{
+				case SDLK_UP:
+				case SDLK_w:
+					theMap.moveForward = false;
+					break;
+				case SDLK_DOWN:
+				case SDLK_s:
+					theMap.moveBackward = false;
+					break;
+				case SDLK_RIGHT:
+				case SDLK_d:
+					theMap.moveRight = false;
+					break;
+				case SDLK_LEFT:
+				case SDLK_a:
+					theMap.moveLeft = false;
+					break;
+				case SDLK_r:
+					theMap.moveUp = false;
+					break;
+				case SDLK_f:
+					theMap.moveDown = false;
+					break;
 				case SDLK_c:
 					leftClick = false;
 					break;
