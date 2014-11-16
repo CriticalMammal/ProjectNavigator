@@ -54,12 +54,12 @@ bool GameMap::generateNewMap(int layerCountIn, int layerRowAmt, int layerColumnA
 {
 	tileTextures = loadTileSheet("tileSheet.png", renderer); //test for errors
 	xOffset = -100;
-	yOffset = 200;
+	yOffset = 100;
 	tileW = tileWidth;
 	tileH = tileHeight;
 	layerCount = layerCountIn;
 	centerLayer = layerCount/2;
-	maxLayersDisplayed = 3;
+	maxLayersDisplayed = 80;
 
 	{
 		playerCloseness = 20;
@@ -99,7 +99,7 @@ bool GameMap::loadMap(std::string filePath, SDL_Renderer* renderer)
 {
 	tileTextures = loadTileSheet("tileSheet.png", renderer);
 	xOffset = -100;
-	yOffset = 200;
+	yOffset = 100;
 
 	ifstream mapFile(filePath);
 	
@@ -214,29 +214,16 @@ bool GameMap::saveMap(std::string fileLocation)
 
 void GameMap::updateMap()
 {
-	if (focusLocation.column < -10000)
+	// The way you check for this needs to be changed, since the initialized values
+	// are unpredictable from the Debug to Release versions of the program.
+	// Maybe just use a bool or something...
+	if (focusLocation.column < -10000 || focusLocation.column > 10000)
 	{
 		findPlayerTile();
 	}
-
-	// Update map based on focus position
-	//x = xOffset - focusLocation.column*(tileW*focusLocation.tile->getZ());
-	/*
-	centerLayer = focusLocation.layer-playerCloseness;
-	if (centerLayer <= 0)
-	{
-		centerLayer = 0;
-	}
-	*/
 	
 	layers[centerLayer]->setX(x);
 	
-	/*
-	int startLayer = centerLayer-(maxLayersDisplayed/2);
-	if (startLayer < 0) {startLayer = 0;}
-	int endLayer = startLayer + maxLayersDisplayed;
-	if (endLayer > layerCount) {endLayer = layerCount;}
-	*/
 	int startLayer = focusLocation.layer - (maxLayersDisplayed/2);
 	if (startLayer < 0) {startLayer = 0;}
 	int endLayer = startLayer + maxLayersDisplayed;
@@ -248,11 +235,9 @@ void GameMap::updateMap()
 	for (int i=startLayer; i<endLayer; i++)
 	{
 		float distFromCenter = i - centerLayer;
-		//layers[i]->setY(layers[i]->getY() + distFromCenter * (distFromCenter/2));
 		layers[i]->setY(y + distFromCenter * (distFromCenter/2));
 		
 		distFromCenter /= layerSpacing;
-		//cout << distFromCenter << endl;
 		
 		float newWidth = x + (tileW*distFromCenter) * layers[centerLayer]->getColumnCount();
 		float newX = x - ((newWidth - originalWidth)/2);
@@ -423,6 +408,8 @@ void GameMap::moveFocusUp()
 			focusLocation.tile = layers[focusLocation.layer]->getTileAt(focusLocation.row, focusLocation.column);
 			focusLocation.tile->setIsEditTile(true);
 		}
+
+		y = yOffset + focusLocation.row * (tileH * focusLocation.tile->getZ());
 	}
 }
 
@@ -445,6 +432,8 @@ void GameMap::moveFocusDown()
 			focusLocation.tile = layers[focusLocation.layer]->getTileAt(focusLocation.row, focusLocation.column);
 			focusLocation.tile->setIsEditTile(true);
 		}
+
+		y = yOffset + focusLocation.row * (tileH * focusLocation.tile->getZ());
 	}
 }
 
@@ -474,12 +463,6 @@ void GameMap::setFocusTile(int tileType)
 
 void GameMap::drawMap(SDL_Rect screenRect, SDL_Renderer* renderer)
 {
-	/*
-	int startLayer = centerLayer-(maxLayersDisplayed/2);
-	if (startLayer < 0) {startLayer = 0;}
-	int endLayer = startLayer + maxLayersDisplayed;
-	if (endLayer > layers.size()) {endLayer = layers.size();}
-	*/
 	int startLayer = focusLocation.layer - (maxLayersDisplayed/2);
 	if (startLayer < 0) {startLayer = 0;}
 	int endLayer = startLayer + maxLayersDisplayed;
@@ -507,10 +490,11 @@ std::vector<SDL_Texture*> GameMap::loadTileSheet (const char* tileSheetPath, SDL
 	//the actual pixel width/height of tiles in tilesheet image
 	int importHeight = 16;
 	int importWidth = 16;
-
+	
 	//load the tile sheet into seperate surfaces
 	for (int h=0; h<tileSheet->h; h+=importHeight)
 	{
+		
 		for (int w=0; w<tileSheet->w; w+=importWidth)
 		{
 			// You needed to load a temporary tile in order for

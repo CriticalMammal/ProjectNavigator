@@ -51,26 +51,20 @@ int Game::run()
 	theMap.loadMap("mapFile.csv", renderer);
 	theMap.setY(100);
 	theMap.setZ(0.6);
-
+	
 	tileEditorMenu;
 	tileEditorMenu.setTileImages(theMap.getTileTextures());
-
+	
 	// Load Audio
-	pageFlip = NULL;
-	pageFlip = Mix_LoadWAV("audio/pageFlip.wav");
 	bgMusic = NULL;
-	bgMusic = Mix_LoadWAV("audio/Broadcast-Misc.wav");
-	if (pageFlip == NULL)
+	bgMusic = Mix_LoadWAV("audio/wind.wav");
+	if (bgMusic == NULL)
 	{
 		cout << "Unable to load a sound. Mixer_ERROR: " << Mix_GetError() << endl;
 	}
-	else if (bgMusic == NULL)
-	{
-		cout << "Unable to load a sound. Mixer_ERROR: " << Mix_GetError() << endl;
-	}
-	Mix_VolumeChunk(pageFlip, 20);
-	//channel = Mix_PlayChannel(-1, bgMusic, -1);
-
+	Mix_VolumeChunk(bgMusic, 100);
+	channel = Mix_PlayChannel(-1, bgMusic, -1);
+	
 	// MAIN LOOP
 	while (quit == false)
 	{
@@ -98,7 +92,8 @@ int Game::run()
 		theMap.updateMap();
 
 		// Render
-		SDL_SetRenderDrawColor(renderer, 88, 232, 206, 0);
+		//SDL_SetRenderDrawColor(renderer, 88, 232, 206, 0); //blue
+		SDL_SetRenderDrawColor(renderer, 204, 176, 214, 255);
 		SDL_RenderClear(renderer);
 
 		theMap.drawMap(screenRect, renderer);
@@ -119,7 +114,6 @@ int Game::run()
 		SDL_RenderFillRect(renderer, &screenRect);
 		SDL_RenderPresent(renderer);
 	}
-	Mix_FreeChunk(pageFlip);
 	Mix_FreeChunk(bgMusic);
 	close();
 	return 0;
@@ -214,12 +208,6 @@ void Game::handleMouse(SDL_Event event)
 			}
 			break;
 	}
-}
-
-
-void Game::playPageFlip()
-{
-	channel = Mix_PlayChannel(-1, pageFlip, 0);
 }
 
 

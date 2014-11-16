@@ -20,7 +20,7 @@ extern double zoom;
 
 TileMap::TileMap()
 {
-
+	distFromCenter = 1000;
 }
 
 
@@ -177,7 +177,7 @@ void TileMap::updateTiles()
 {
 	double tempX = x;
 	double tempY = y;
-	
+
 	for (int r=0; r < rows; r++)
 	{
 		// Set tile in each column

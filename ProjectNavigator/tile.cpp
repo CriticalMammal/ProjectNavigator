@@ -38,6 +38,8 @@ Tile::~Tile()
 
 void Tile::updateTile()
 {
+	float lerpSpeed = 0.08;
+
 	// Update x
 	if (x != goalX)
 	{
@@ -46,7 +48,7 @@ void Tile::updateTile()
 
 	if (xLerp < 1.0)
 	{
-		xLerp += 0.1;
+		xLerp += lerpSpeed;
 	}
 
 	float newX = lerp(x, xLerp, goalX);
@@ -60,7 +62,7 @@ void Tile::updateTile()
 
 	if (yLerp < 1.0)
 	{
-		yLerp += 0.1;
+		yLerp += lerpSpeed;
 	}
 
 	float newY = lerp(y, yLerp, goalY);
@@ -74,7 +76,7 @@ void Tile::updateTile()
 
 	if (zLerp < 1.0)
 	{
-		zLerp += 0.1;
+		zLerp += lerpSpeed;
 	}
 
 	float newZ = lerp(z, zLerp, goalZ);
