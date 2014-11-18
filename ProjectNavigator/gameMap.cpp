@@ -60,7 +60,7 @@ bool GameMap::generateNewMap(int layerCountIn, int layerRowAmt, int layerColumnA
 			double tileWidth, double tileHeight, SDL_Renderer* renderer)
 {
 	tileTextures = loadTileSheet("tileSheet.png", renderer); //test for errors
-	xOffset = -100;
+	xOffset = 0;
 	yOffset = 100;
 	tileW = tileWidth;
 	tileH = tileHeight;
@@ -105,7 +105,7 @@ bool GameMap::generateNewMap(int layerCountIn, int layerRowAmt, int layerColumnA
 bool GameMap::loadMap(std::string filePath, SDL_Renderer* renderer)
 {
 	tileTextures = loadTileSheet("tileSheet.png", renderer);
-	xOffset = -100;
+	xOffset = 250;
 	yOffset = 100;
 
 	ifstream mapFile(filePath);
@@ -216,7 +216,7 @@ bool GameMap::saveMap(std::string fileLocation)
 	externMapFile.close();
 
 	return true;
-}
+} // End saveMap()
 
 
 void GameMap::updateMap()
@@ -243,7 +243,8 @@ void GameMap::updateMap()
 	int endLayer = startLayer + maxLayersDisplayed;
 	if (endLayer > layers.size()) {endLayer = layers.size();}
 
-	float originalWidth = layers[centerLayer]->getX() + tileW * layers[centerLayer]->getColumnCount();
+	//float originalWidth = layers[centerLayer]->getX() + tileW * layers[centerLayer]->getColumnCount();
+	float originalWidth = tileW * focusLocation.column;
 
 	// Updating tilemap positions
 	for (int i=startLayer; i<endLayer; i++)
@@ -253,8 +254,9 @@ void GameMap::updateMap()
 		
 		distFromCenter /= layerSpacing;
 		
-		float newWidth = x + (tileW*distFromCenter) * layers[centerLayer]->getColumnCount();
-		float newX = x - ((newWidth - originalWidth)/2);
+		//float newWidth = x + (tileW*distFromCenter) * layers[centerLayer]->getColumnCount();
+		float newWidth = (tileW*distFromCenter) * focusLocation.column;
+		float newX = x - ((newWidth - originalWidth));
 
 		layers[i]->setX(newX);
 		layers[i]->setZ(z+distFromCenter);
@@ -264,14 +266,24 @@ void GameMap::updateMap()
 
 	updateFocusTile();
 	
-	// Update map based on focus position (Should you really be doing this again in focus movement?)
-	x = xOffset - focusLocation.column*(tileW*focusLocation.tile->getZ());
-	y = yOffset + focusLocation.row * (tileH * focusLocation.tile->getZ());
-	centerLayer = focusLocation.layer-playerCloseness;
-	if (centerLayer <= 0)
+	if (moveUp != true && moveDown != true && moveForward != true &&
+		moveBackward != true && moveLeft != true && moveRight != true)
 	{
-		centerLayer = 0;
+		// Update map based on focus position (Should you really be doing this again in focus movement?)
+		float distFromCenter = focusLocation.layer - centerLayer;
+		distFromCenter /= layerSpacing;
+		// for x... WHY does adding the distFromCenter to the z keep the player centered? it was already added to the tile's
+		// z value before, so doing this adds it AGAIN. This is very confusing....
+		x = xOffset - focusLocation.column * (tileW * (focusLocation.tile->getZ() + distFromCenter));
+		y = yOffset + focusLocation.row * (tileH * focusLocation.tile->getZ());
+		
+		centerLayer = focusLocation.layer-playerCloseness;
+		if (centerLayer <= 0)
+		{
+			centerLayer = 0;
+		}
 	}
+	
 	
 } // END updateMap()
 
@@ -332,13 +344,12 @@ void GameMap::moveFocusForward()
 			focusLocation.tile->setIsEditTile(true);
 			focusLocation.tile->canMove(); // Reset the movement time
 		}
-		/*
+		
 		centerLayer = focusLocation.layer-playerCloseness;
 		if (centerLayer <= 0)
 		{
 			centerLayer = 0;
 		}
-		*/
 	}
 }
 
@@ -370,13 +381,12 @@ void GameMap::moveFocusBackward()
 			focusLocation.tile->setIsEditTile(true);
 			focusLocation.tile->canMove(); // Reset the movement time
 		}
-		/*
+		
 		centerLayer = focusLocation.layer-playerCloseness;
 		if (centerLayer <= 0)
 		{
 			centerLayer = 0;
 		}
-		*/
 	}
 }
 
@@ -401,8 +411,10 @@ void GameMap::moveFocusLeft()
 			focusLocation.tile->setIsEditTile(true);
 			focusLocation.tile->canMove(); // Reset the movement time
 		}
-
-		x = xOffset - focusLocation.column*(tileW*focusLocation.tile->getZ());
+		
+		float distFromCenter = focusLocation.layer - centerLayer;
+		distFromCenter /= layerSpacing;
+		x = xOffset - focusLocation.column * (tileW * (focusLocation.tile->getZ() + distFromCenter));
 	}
 }
 
@@ -428,7 +440,9 @@ void GameMap::moveFocusRight()
 			focusLocation.tile->canMove(); // Reset the movement time
 		}
 
-		x = xOffset - focusLocation.column*(tileW*focusLocation.tile->getZ());
+		float distFromCenter = focusLocation.layer - centerLayer;
+		distFromCenter /= layerSpacing;
+		x = xOffset - focusLocation.column * (tileW * (focusLocation.tile->getZ() + distFromCenter));
 	}
 }
 
